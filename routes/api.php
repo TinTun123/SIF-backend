@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\VideoController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\SubsessionController;
+use App\Models\Subsession;
 
 /*
 |--------------------------------------------------------------------------
@@ -39,7 +40,7 @@ Route::get('courses/sessions/{id}', [CourseController::class, 'sessionsData']);
 Route::get('/sessions/{id}', [CourseController::class, 'getSession']);
 
 Route::prefix('subsessions')->group(function () {
-
+    Route::get('all/{id}', [SubsessionController::class, 'subSessionAll']);
     Route::post('/', [SubsessionController::class, 'store']);
     Route::put('/{id}', [SubsessionController::class, 'update']);
 });

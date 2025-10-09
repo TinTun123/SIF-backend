@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Session;
 use App\Models\Subsession;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class SubsessionController extends Controller
 {
@@ -26,6 +27,18 @@ class SubsessionController extends Controller
         ], 200);
     }
 
+    public function subSessionAll($sessionId)
+    {
+        $subsessions = Subsession::where('session_id', $sessionId)
+            ->orderBy('number', 'asc')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'subsessions' => $subsessions,
+        ], 200);
+    }
+
     /**
      * Fetch full subsession by ID (with content)
      */
@@ -33,6 +46,7 @@ class SubsessionController extends Controller
     {
         $subsession = Subsession::findOrFail($subsessionId);
 
+        Log::info("Subsessions : ", [$subsession]);
         return response()->json([
             'success' => true,
             'subsession' => $subsession,
