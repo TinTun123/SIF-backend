@@ -46,7 +46,6 @@ class SubsessionController extends Controller
     {
         $subsession = Subsession::findOrFail($subsessionId);
 
-        Log::info("Subsessions : ", [$subsession]);
         return response()->json([
             'success' => true,
             'subsession' => $subsession,

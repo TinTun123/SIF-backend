@@ -5,6 +5,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\VideoController;
 use App\Http\Controllers\CourseController;
+use App\Http\Controllers\MovementController;
+use App\Http\Controllers\StoryController;
 use App\Http\Controllers\SubsessionController;
 use App\Models\Subsession;
 
@@ -36,16 +38,41 @@ Route::prefix('courses')->group(function () {
     Route::delete('/{id}', [CourseController::class, 'destroy']);
 });
 
+// Fetch every session meta data base on courseID without content
 Route::get('courses/sessions/{id}', [CourseController::class, 'sessionsData']);
+
+// Fetch one session base on id with content
 Route::get('/sessions/{id}', [CourseController::class, 'getSession']);
 
+
+// Fetch every subsession of particular session including content
+Route::get('sessions/all/{id}', [CourseController::class, 'sessionAll']);
+
 Route::prefix('subsessions')->group(function () {
+    // Fetch every subsession of particular session including content
     Route::get('all/{id}', [SubsessionController::class, 'subSessionAll']);
+
     Route::post('/', [SubsessionController::class, 'store']);
     Route::put('/{id}', [SubsessionController::class, 'update']);
 });
 
+Route::get('stories/', [StoryController::class, 'index']);
+Route::post('stories/', [StoryController::class, 'create']);
+Route::put('stories/{story}', [StoryController::class, 'update']);
+Route::get('stories/{story}', [StoryController::class, 'getStory']);
+Route::delete('stories/{story}', [StoryController::class, 'destroy']);
+
+Route::get('movements/', [MovementController::class, 'index']);
+Route::post('movements/', [MovementController::class, 'create']);
+Route::put('movements/{movement}', [MovementController::class, 'update']);
+Route::get('movements/{movement}', [MovementController::class, 'getStory']);
+Route::delete('movements/{movement}', [MovementController::class, 'destroy']);
+
+
+// Fetch record of single subsession
 Route::get('subsessions/{subSessionId}', [SubsessionController::class, 'getSubsession']);
+
+// Fetch a every subsession of certain sessionID without content
 Route::get('sessions/subSession/{sessionId}', [SubsessionController::class, 'subsessionData']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

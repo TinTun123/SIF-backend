@@ -37,6 +37,19 @@ class CourseController extends Controller
         ], 200);
     }
 
+    // Fetch every sessions of certain course including content
+    public function sessionAll(Request $request, $courseId)
+    {
+        $sessions = Session::where('course_id', $courseId)
+            ->orderBy('number', 'asc')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'sessions' => $sessions,
+        ], 200);
+    }
+
     /**
      * Fetch sessions by Course ID excluding large content fields
      */
