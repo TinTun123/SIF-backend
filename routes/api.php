@@ -4,6 +4,7 @@ use App\Http\Controllers\API\PolicyController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\VideoController;
+use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\MovementController;
 use App\Http\Controllers\StoryController;
@@ -67,6 +68,12 @@ Route::post('movements/', [MovementController::class, 'create']);
 Route::put('movements/{movement}', [MovementController::class, 'update']);
 Route::get('movements/{movement}', [MovementController::class, 'getStory']);
 Route::delete('movements/{movement}', [MovementController::class, 'destroy']);
+
+Route::get('articles/', [ArticleController::class, 'index']);
+Route::post('articles/', [ArticleController::class, 'create']);
+Route::put('articles/{article}', [ArticleController::class, 'update']);
+Route::get('articles/{article}', [ArticleController::class, 'getArticle']);
+Route::delete('articles/{article}', [ArticleController::class, 'destroy']);
 
 
 // Fetch record of single subsession
