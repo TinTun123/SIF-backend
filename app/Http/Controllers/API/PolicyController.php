@@ -14,7 +14,9 @@ class PolicyController extends Controller
     public function index()
     {
         $policies = Policy::latest()->get();
-        return PolicyResource::collection($policies);
+        return response()->json(
+            PolicyResource::collection($policies)->resolve()
+        );
     }
 
     public function show($id)
