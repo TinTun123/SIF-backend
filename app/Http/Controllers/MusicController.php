@@ -51,6 +51,11 @@ class MusicController extends Controller
             $file = $request->file('file_url');
             $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
             $path = $file->storeAs('public/music', $filename); // stored in storage/app/public/covers
+
+            // Force permission for web access
+            chmod(storage_path('app/public/music/' . $filename), 0644);
+
+
             $coverUrl = Storage::url($path); // generates /storage/covers/xxxx.jpg
             // Optional: full URL if needed
             $coverUrl = asset($coverUrl);
@@ -101,6 +106,11 @@ class MusicController extends Controller
             $file = $request->file('file_url');
             $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
             $path = $file->storeAs('public/music', $filename); // stored in storage/app/public/covers
+
+            // Force permission for web access
+            chmod(storage_path('app/public/music/' . $filename), 0644);
+
+
             $coverUrl = Storage::url($path); // generates /storage/covers/xxxx.jpg
             // Optional: full URL if needed
             $coverUrl = asset($coverUrl);

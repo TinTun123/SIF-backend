@@ -21,6 +21,10 @@ class AuthController extends Controller
             'password' => 'required|string|min:8|confirmed', // 'confirmed' expects 'password_confirmation'
         ]);
 
+        if ($request->user()->level != 1) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
         // Create user
         $user = User::create([
             'name' => $validated['username'],

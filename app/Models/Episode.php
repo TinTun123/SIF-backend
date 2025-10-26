@@ -9,7 +9,7 @@ class Episode extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title', 'number', 'description', 'fileURL', 'podcast_id'];
+    protected $fillable = ['title', 'number', 'description', 'fileURL', 'podcast_id', 'duration'];
 
     public function podcast()
     {

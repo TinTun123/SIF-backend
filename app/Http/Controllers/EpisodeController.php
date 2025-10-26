@@ -28,6 +28,7 @@ class EpisodeController extends Controller
             'title' => 'required|string',
             'number' => 'required|integer',
             'description' => 'required|string',
+            'duration' => 'required|String',
             'fileURL' => 'required|file|mimetypes:video/mp4,video/avi,video/mpeg,video/quicktime,video/x-ms-wmv',
         ]);
 
@@ -36,6 +37,10 @@ class EpisodeController extends Controller
             $file = $request->file('fileURL');
             $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
             $path = $file->storeAs('public/episodes', $filename);
+
+            // Force permission for web access
+            chmod(storage_path('app/public/episodes/' . $filename), 0644);
+
             $fileUrl = asset(Storage::url($path));
         }
 
@@ -44,6 +49,7 @@ class EpisodeController extends Controller
             'title' => $validated['title'],
             'number' => $validated['number'],
             'description' => $validated['description'],
+            'duration' => $validated['duration'],
             'fileURL' => $fileUrl,
         ]);
 
@@ -84,16 +90,17 @@ class EpisodeController extends Controller
     {
 
         $validated = $request->validate([
-            'title' => 'nullable|string',
-            'number' => 'nullable|integer',
-            'description' => 'nullable|string',
+            'title' => 'required|string',
+            'number' => 'required|integer',
+            'duration' => 'required|string',
+            'description' => 'required|string',
             'fileURL' => 'nullable|file|mimetypes:video/mp4,video/avi,video/mpeg,video/quicktime,video/x-ms-wmv',
         ]);
 
         $data = [];
 
         // Copy only fields that are provided
-        foreach (['title', 'number', 'description'] as $field) {
+        foreach (['title', 'number', 'description', 'duration'] as $field) {
             if ($request->filled($field)) {
                 $data[$field] = $validated[$field];
             }
@@ -113,6 +120,9 @@ class EpisodeController extends Controller
             $file = $request->file('fileURL');
             $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
             $path = $file->storeAs('public/episodes', $filename);
+
+            // Force permission for web access
+            chmod(storage_path('app/public/episodes/' . $filename), 0644);
 
             // Generate public URL
             $data['fileURL'] = asset(Storage::url($path));

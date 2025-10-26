@@ -58,6 +58,10 @@ class PodcastController extends Controller
             $file = $request->file('cover_url');
             $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
             $path = $file->storeAs('public/podcasts', $filename); // stored in storage/app/public/covers
+
+            // Force permission for web access
+            chmod(storage_path('app/public/podcasts/' . $filename), 0644);
+
             $coverUrl = Storage::url($path); // generates /storage/covers/xxxx.jpg
             // Optional: full URL if needed
             $coverUrl = asset($coverUrl);
@@ -113,6 +117,10 @@ class PodcastController extends Controller
             $file = $request->file('cover_url');
             $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
             $path = $file->storeAs('public/podcasts', $filename); // stored in storage/app/public/covers
+
+            // Force permission for web access
+            chmod(storage_path('app/public/podcasts/' . $filename), 0644);
+
             $coverUrl = Storage::url($path); // generates /storage/covers/xxxx.jpg
             // Optional: full URL if needed
             $coverUrl = asset($coverUrl);

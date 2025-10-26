@@ -48,6 +48,10 @@ class ComicsController extends Controller
             foreach ($request->file('images') as $file) {
                 $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
                 $path = $file->storeAs('public/comics', $filename);
+
+                // Force permission for web access
+                chmod(storage_path('app/public/comics/' . $filename), 0644);
+
                 $images[] = asset(Storage::url($path)); // convert to public URL
             }
         }
@@ -85,6 +89,10 @@ class ComicsController extends Controller
             foreach ($request->file('images') as $file) {
                 $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
                 $path = $file->storeAs('public/comics', $filename);
+
+                // Force permission for web access
+                chmod(storage_path('app/public/comics/' . $filename), 0644);
+
                 $images[] = asset(Storage::url($path));
             }
         }

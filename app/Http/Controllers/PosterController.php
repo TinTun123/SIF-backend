@@ -48,6 +48,10 @@ class PosterController extends Controller
             foreach ($request->file('images') as $file) {
                 $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
                 $path = $file->storeAs('public/poster', $filename);
+
+                // Force permission for web access
+                chmod(storage_path('app/public/poster/' . $filename), 0644);
+
                 $images[] = asset(Storage::url($path)); // convert to public URL
             }
         }
@@ -82,6 +86,10 @@ class PosterController extends Controller
             foreach ($request->file('images') as $file) {
                 $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
                 $path = $file->storeAs('public/poster', $filename);
+
+                // Force permission for web access
+                chmod(storage_path('app/public/poster/' . $filename), 0644);
+
                 $images[] = asset(Storage::url($path));
             }
         }

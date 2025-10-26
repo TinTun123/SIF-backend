@@ -21,6 +21,7 @@ class EpisodeResource extends JsonResource
             'description' => $this->description,
             'fileURL' => $this->fileURL,
             'created_at' => $this->created_at,
+            'duration' => $this->duration
         ];
     }
 }

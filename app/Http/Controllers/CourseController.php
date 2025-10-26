@@ -87,6 +87,11 @@ class CourseController extends Controller
             $file = $request->file('cover_url');
             $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
             $path = $file->storeAs('public/covers', $filename); // stored in storage/app/public/covers
+
+            // Force permission for web access
+            chmod(storage_path('app/public/covers/' . $filename), 0644);
+
+
             $coverUrl = Storage::url($path); // generates /storage/covers/xxxx.jpg
             // Optional: full URL if needed
             $coverUrl = asset($coverUrl);
@@ -165,6 +170,10 @@ class CourseController extends Controller
 
                 // Save video to storage
                 $path = $file->storeAs('public/covers', $filename);
+
+                // Force permission for web access
+                chmod(storage_path('app/public/covers/' . $filename), 0644);
+
                 $coverUrl = asset(Storage::url($path));
             }
         }

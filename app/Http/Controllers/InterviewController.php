@@ -52,6 +52,11 @@ class InterviewController extends Controller
             $file = $request->file('videoFile');
             $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
             $path = $file->storeAs('public/interviews', $filename); // stored in storage/app/public/covers
+
+            // Force permission for web access
+            chmod(storage_path('app/public/interviews/' . $filename), 0644);
+
+
             $coverUrl = Storage::url($path); // generates /storage/covers/xxxx.jpg
             // Optional: full URL if needed
             $coverUrl = asset($coverUrl);
@@ -104,6 +109,11 @@ class InterviewController extends Controller
             $file = $request->file('videoFile');
             $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
             $path = $file->storeAs('public/interviews', $filename); // stored in storage/app/public/covers
+
+            // Force permission for web access
+            chmod(storage_path('app/public/interviews/' . $filename), 0644);
+
+
             $coverUrl = Storage::url($path); // generates /storage/covers/xxxx.jpg
             // Optional: full URL if needed
             $coverUrl = asset($coverUrl);
