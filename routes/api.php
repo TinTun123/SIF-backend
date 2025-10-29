@@ -80,6 +80,7 @@ Route::get('comics/{comic}', [ComicsController::class, 'getComics']);
 
 Route::get('statements/', [StatementController::class, 'index']);
 Route::get('statements/{statement}', [StatementController::class, 'getStatement']);
+Route::post('statements/delta-sync', [StatementController::class, 'deltaSync']);
 
 Route::get('posters/', [PosterController::class, 'index']);
 Route::get('posters/{poster}', [PosterController::class, 'getPoster']);

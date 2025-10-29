@@ -21,3 +21,18 @@
     # --- Fallback: Let Laravel handle everything else (SPA routes)
     RewriteRule ^ index.php [L]
 </IfModule>
+
+<IfModule mod_headers.c>
+    Header set Access-Control-Allow-Origin "http://localhost:5173"
+</IfModule>
+
+# <IfModule mod_headers.c>
+#     # Match either of your allowed origins
+#     SetEnvIf Origin "http://localhost:(4173|5173)$" AccessControlAllowOrigin=$0
+
+#     # Apply only if the origin matched
+#     Header always set Access-Control-Allow-Origin "%{AccessControlAllowOrigin}e" env=AccessControlAllowOrigin
+#     Header always set Access-Control-Allow-Credentials "true" env=AccessControlAllowOrigin
+#     Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS" env=AccessControlAllowOrigin
+#     Header always set Access-Control-Allow-Headers "Content-Type, Authorization" env=AccessControlAllowOrigin
+# </IfModule>
