@@ -36,7 +36,7 @@ use App\Models\User;
 Route::get('/videos', [VideoController::class, 'index']);
 Route::get('/policies', [PolicyController::class, 'index']);
 Route::get('/policies/{id}', [PolicyController::class, 'show']);
-
+Route::post('policies/delta-sync', [PolicyController::class, 'deltaSync']);
 
 Route::prefix('courses')->group(function () {
     Route::get('/', [CourseController::class, 'index']);

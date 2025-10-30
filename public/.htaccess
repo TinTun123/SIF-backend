@@ -23,16 +23,18 @@
 </IfModule>
 
 <IfModule mod_headers.c>
-    Header set Access-Control-Allow-Origin "http://localhost:5173"
+    Header set Access-Control-Allow-Origin "http://localhost:4173"
 </IfModule>
 
 # <IfModule mod_headers.c>
-#     # Match either of your allowed origins
-#     SetEnvIf Origin "http://localhost:(4173|5173)$" AccessControlAllowOrigin=$0
+#     # Match multiple allowed origins and capture full match
+#     SetEnvIfNoCase Origin "https?://(www\.)?(frontend\.mef-myanmar\.com|admin\.mef-myanmar\.com)$" AccessControlAllowOrigin=$0
 
-#     # Apply only if the origin matched
-#     Header always set Access-Control-Allow-Origin "%{AccessControlAllowOrigin}e" env=AccessControlAllowOrigin
+#     # Set the Access-Control-Allow-Origin header if env variable exists
+#     Header set Access-Control-Allow-Origin "%{AccessControlAllowOrigin}e" env=AccessControlAllowOrigin
 #     Header always set Access-Control-Allow-Credentials "true" env=AccessControlAllowOrigin
-#     Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS" env=AccessControlAllowOrigin
-#     Header always set Access-Control-Allow-Headers "Content-Type, Authorization" env=AccessControlAllowOrigin
+
+#     # Ensure caching proxies vary by Origin
+#     Header always set Vary "Origin"
 # </IfModule>
+

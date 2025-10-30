@@ -29,6 +29,7 @@ class PolicyResource extends JsonResource
             'content_eng' => $this->content_eng, // stay as string
             'content_bur' => $this->content_bur, // stay as string
             'created_at' => $this->created_at?->toDateTimeString(),
+            'etag' => md5(optional($this->updated_at)->toIso8601String()),
         ];
     }
 }

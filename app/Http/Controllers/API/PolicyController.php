@@ -6,17 +6,48 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\PolicyResource;
 use App\Models\Policy;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class PolicyController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $policies = Policy::latest()->get();
-        return response()->json(
-            PolicyResource::collection($policies)->resolve()
-        );
+        return response()->json(PolicyResource::collection($policies)->resolve());
+    }
+
+    public function deltaSync(Request $request)
+    {
+        $clientRecords = $request->json()->all(); // [{id, etag}]
+        $clientMap = collect($clientRecords)->pluck('etag', 'id');
+
+        // Get all existing statements
+        $allpolicies = Policy::select('id', 'title_eng', 'title_bur', 'date', 'organizations', 'logos', 'content_eng', 'content_bur', 'updated_at')->get();
+
+        // Determine new and updated separately
+        $added = $allpolicies->filter(function ($ploy) use ($clientMap) {
+            return !isset($clientMap[$ploy->id]); // new to client
+        })->values();
+
+        $updated = $allpolicies->filter(function ($ploy) use ($clientMap) {
+            $currentEtag = md5(optional($ploy->updated_at)->toIso8601String());
+            return isset($clientMap[$ploy->id]) && $clientMap[$ploy->id] !== $currentEtag;
+        })->values();
+
+
+        $deletedIds = $clientMap->keys()->diff($allpolicies->pluck('id'));
+
+        // 🟢 Use PolicyResource for consistent formatting
+        $addedResource = PolicyResource::collection($added)->resolve();
+        $updatedResource = PolicyResource::collection($updated)->resolve();
+
+        return response()->json([
+            'addedPol' => $addedResource,
+            'updatedPol' => $updatedResource,
+            'deletedPol' => $deletedIds->values(),
+        ]);
     }
 
     public function show($id)
@@ -72,7 +103,7 @@ class PolicyController extends Controller
         return response()->json([
             'success' => true,
             'policy' => $policy,
-        ], 201);
+        ], 200);
     }
 
     /**
@@ -126,7 +157,6 @@ class PolicyController extends Controller
             foreach ($request->file('logos') as $file) {
                 $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
                 $path = $file->storeAs('public/logos', $filename);
-
 
                 // Force permission for web access
                 chmod(storage_path('app/public/logos/' . $filename), 0644);

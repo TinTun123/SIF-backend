@@ -22,23 +22,10 @@ class StatementController extends Controller
             return $s;
         });
 
-        // Compute global last modified
-        $lastModified = optional($statements->max('updated_at'))->toRfc7231String();
-
-        // If client sends If-Modified-Since and nothing changed
-        if ($request->hasHeader('If-Modified-Since')) {
-            $clientTime = \Carbon\Carbon::parse($request->header('If-Modified-Since'));
-            $serverTime = \Carbon\Carbon::parse($lastModified);
-
-            if ($clientTime->equalTo($serverTime) || $clientTime->greaterThan($serverTime)) {
-                return response()->noContent(304); // Not Modified
-            }
-        }
-
         return response()->json([
             'success' => true,
             'statements' => $statements,
-        ], 200)->header('Last-Modified', $lastModified);
+        ], 200);
     }
 
     public function getStatement(Request $request, Statement $statement)
