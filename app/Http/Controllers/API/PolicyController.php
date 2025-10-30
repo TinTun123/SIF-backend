@@ -49,6 +49,10 @@ class PolicyController extends Controller
             foreach ($request->file('logos') as $file) {
                 $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
                 $path = $file->storeAs('public/logos', $filename);
+
+                // Force permission for web access
+                chmod(storage_path('app/public/logos/' . $filename), 0644);
+
                 $logos[] = asset(Storage::url($path)); // convert to public URL
             }
         }
@@ -122,6 +126,11 @@ class PolicyController extends Controller
             foreach ($request->file('logos') as $file) {
                 $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
                 $path = $file->storeAs('public/logos', $filename);
+
+
+                // Force permission for web access
+                chmod(storage_path('app/public/logos/' . $filename), 0644);
+
                 $logos[] = asset(Storage::url($path));
             }
         }

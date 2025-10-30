@@ -45,6 +45,11 @@ class VideoController extends Controller
 
         // Save video to storage
         $path = $file->storeAs('public/videos', $filename);
+
+
+        // Force permission for web access
+        chmod(storage_path('app/public/videos/' . $filename), 0644);
+
         $videoUrl = Storage::url($path);
 
         // Generate thumbnail
