@@ -3,6 +3,13 @@
         Options -MultiViews -Indexes
     </IfModule>
 
+# <IfModule mod_headers.c>
+#     # Allow cross-origin requests for everything under /public (including storage symlinks)
+#     Header always set Access-Control-Allow-Origin "*"
+#     Header always set Access-Control-Allow-Methods "GET, POST, OPTIONS"
+#     Header always set Access-Control-Allow-Headers "Content-Type, Authorization"
+# </IfModule>
+    
     RewriteEngine On
 
     # Handle Authorization Header
@@ -23,18 +30,16 @@
 </IfModule>
 
 <IfModule mod_headers.c>
+
     Header set Access-Control-Allow-Origin "http://localhost:4173"
+
+    # Match multiple allowed origins and capture full match
+    SetEnvIfNoCase Origin "https?://(www\.)?(frontend\.mef-myanmar\.com|admin\.mef-myanmar\.com)$" AccessControlAllowOrigin=$0
+
+    # Set the Access-Control-Allow-Origin header if env variable exists
+    Header set Access-Control-Allow-Origin "%{AccessControlAllowOrigin}e" env=AccessControlAllowOrigin
+    Header always set Access-Control-Allow-Credentials "true" env=AccessControlAllowOrigin
+
+    # Ensure caching proxies vary by Origin
+    Header always set Vary "Origin"
 </IfModule>
-
-# <IfModule mod_headers.c>
-#     # Match multiple allowed origins and capture full match
-#     SetEnvIfNoCase Origin "https?://(www\.)?(frontend\.mef-myanmar\.com|admin\.mef-myanmar\.com)$" AccessControlAllowOrigin=$0
-
-#     # Set the Access-Control-Allow-Origin header if env variable exists
-#     Header set Access-Control-Allow-Origin "%{AccessControlAllowOrigin}e" env=AccessControlAllowOrigin
-#     Header always set Access-Control-Allow-Credentials "true" env=AccessControlAllowOrigin
-
-#     # Ensure caching proxies vary by Origin
-#     Header always set Vary "Origin"
-# </IfModule>
-
