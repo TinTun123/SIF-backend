@@ -30,6 +30,7 @@
 </IfModule>
 
 <IfModule mod_headers.c>
+<<<<<<< HEAD
     # Match multiple allowed origins and capture full match
     SetEnvIfNoCase Origin "https?://(www\.)?(frontend\.mef-myanmar\.com|admin\.mef-myanmar\.com)$" AccessControlAllowOrigin=$0
 
@@ -41,3 +42,18 @@
     Header always set Vary "Origin"
 </IfModule>
 
+=======
+    Header set Access-Control-Allow-Origin "http://localhost:5173"
+</IfModule>
+
+# <IfModule mod_headers.c>
+#     # Match either of your allowed origins
+#     SetEnvIf Origin "http://localhost:(4173|5173)$" AccessControlAllowOrigin=$0
+
+#     # Apply only if the origin matched
+#     Header always set Access-Control-Allow-Origin "%{AccessControlAllowOrigin}e" env=AccessControlAllowOrigin
+#     Header always set Access-Control-Allow-Credentials "true" env=AccessControlAllowOrigin
+#     Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS" env=AccessControlAllowOrigin
+#     Header always set Access-Control-Allow-Headers "Content-Type, Authorization" env=AccessControlAllowOrigin
+# </IfModule>
+>>>>>>> 3bd1171764087f7ee3c5a24bd89724a0350f6987

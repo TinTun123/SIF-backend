@@ -12,14 +12,33 @@ class StatementController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
-        $statement = Statement::select('id', 'title', 'date', 'tags', 'images')->get();
+        $statements = Statement::select('id', 'title', 'date', 'tags', 'images', 'updated_at')->get();
+
+        // Add individual record etags
+        $statements->transform(function ($s) {
+            $s->etag = md5($s->updated_at);
+            return $s;
+        });
+
+        // Compute global last modified
+        $lastModified = optional($statements->max('updated_at'))->toRfc7231String();
+
+        // If client sends If-Modified-Since and nothing changed
+        if ($request->hasHeader('If-Modified-Since')) {
+            $clientTime = \Carbon\Carbon::parse($request->header('If-Modified-Since'));
+            $serverTime = \Carbon\Carbon::parse($lastModified);
+
+            if ($clientTime->equalTo($serverTime) || $clientTime->greaterThan($serverTime)) {
+                return response()->noContent(304); // Not Modified
+            }
+        }
+
         return response()->json([
             'success' => true,
-            'statements' => $statement,
-        ], 200);
+            'statements' => $statements,
+        ], 200)->header('Last-Modified', $lastModified);
     }
 
     public function getStatement(Request $request, Statement $statement)
@@ -28,6 +47,43 @@ class StatementController extends Controller
             'success' => true,
             'statement' => $statement,
         ], 200);
+    }
+
+    public function deltaSync(Request $request)
+    {
+        $clientRecords = $request->json()->all(); // [{id, etag}]
+        $clientMap = collect($clientRecords)->pluck('etag', 'id');
+
+        // Get all existing statements
+        $allStatements = Statement::select('id', 'title', 'date', 'tags', 'images', 'updated_at')->get();
+
+        // Determine new and updated separately
+        $added = $allStatements->filter(function ($stmt) use ($clientMap) {
+            return !isset($clientMap[$stmt->id]); // new to client
+        })->values();
+
+        $updated = $allStatements->filter(function ($stmt) use ($clientMap) {
+            $currentEtag = md5($stmt->updated_at);
+            return isset($clientMap[$stmt->id]) && $clientMap[$stmt->id] !== $currentEtag;
+        })->values();
+
+        $added->transform(function ($stmt) {
+            $stmt->etag = md5($stmt->updated_at);
+            return $stmt;
+        });
+
+        $updated->transform(function ($stmt) {
+            $stmt->etag = md5($stmt->updated_at);
+            return $stmt;
+        });
+
+        $deletedIds = $clientMap->keys()->diff($allStatements->pluck('id'));
+
+        return response()->json([
+            'added' => $added->values(),
+            'updated' => $updated->values(),
+            'deleted' => $deletedIds->values(),
+        ]);
     }
 
     /**
