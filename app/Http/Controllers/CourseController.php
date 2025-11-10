@@ -16,7 +16,89 @@ class CourseController extends Controller
      */
     public function index()
     {
-        return Course::withCount('sessions')->get();
+        $courses = Course::withCount('sessions')->get();
+
+        $courses->transform(function ($s) {
+            $s->etag = md5($s->updated_at);
+            return $s;
+        });
+
+        return $courses;
+    }
+
+
+    public function deltaSync(Request $request)
+    {
+        $clientRecords = $request->json()->all(); // [{id, etag}]
+        $clientMap = collect($clientRecords)->pluck('etag', 'id');
+
+        // Get all existing statements
+        $allCourses = Course::get();
+
+        // Determine new and updated separately
+        $added = $allCourses->filter(function ($stmt) use ($clientMap) {
+            return !isset($clientMap[$stmt->id]); // new to client
+        })->values();
+
+        $updated = $allCourses->filter(function ($stmt) use ($clientMap) {
+            $currentEtag = md5($stmt->updated_at);
+            return isset($clientMap[$stmt->id]) && $clientMap[$stmt->id] !== $currentEtag;
+        })->values();
+
+        $added->transform(function ($stmt) {
+            $stmt->etag = md5($stmt->updated_at);
+            return $stmt;
+        });
+
+        $updated->transform(function ($stmt) {
+            $stmt->etag = md5($stmt->updated_at);
+            return $stmt;
+        });
+
+        $deletedIds = $clientMap->keys()->diff($allCourses->pluck('id'));
+
+        return response()->json([
+            'added' => $added->values(),
+            'updated' => $updated->values(),
+            'deleted' => $deletedIds->values(),
+        ]);
+    }
+
+    public function deltaSyncSession(Request $request)
+    {
+        $clientRecords = $request->json()->all(); // [{id, etag}]
+        $clientMap = collect($clientRecords)->pluck('etag', 'id');
+
+        // Get all existing statements
+        $allSessions = Session::get();
+
+        // Determine new and updated separately
+        $added = $allSessions->filter(function ($stmt) use ($clientMap) {
+            return !isset($clientMap[$stmt->id]); // new to client
+        })->values();
+
+        $updated = $allSessions->filter(function ($stmt) use ($clientMap) {
+            $currentEtag = md5($stmt->updated_at);
+            return isset($clientMap[$stmt->id]) && $clientMap[$stmt->id] !== $currentEtag;
+        })->values();
+
+        $added->transform(function ($stmt) {
+            $stmt->etag = md5($stmt->updated_at);
+            return $stmt;
+        });
+
+        $updated->transform(function ($stmt) {
+            $stmt->etag = md5($stmt->updated_at);
+            return $stmt;
+        });
+
+        $deletedIds = $clientMap->keys()->diff($allSessions->pluck('id'));
+
+        return response()->json([
+            'addedSec' => $added->values(),
+            'updatedSec' => $updated->values(),
+            'deletedSec' => $deletedIds->values(),
+        ]);
     }
 
     public function get($id)
@@ -31,6 +113,8 @@ class CourseController extends Controller
     {
         $session = Session::findOrFail($sessionId);
 
+        $session['etag'] =  md5($session->updated_at);
+
         return response()->json([
             'success' => true,
             'session' => $session,
@@ -43,6 +127,11 @@ class CourseController extends Controller
         $sessions = Session::where('course_id', $courseId)
             ->orderBy('number', 'asc')
             ->get();
+
+        $sessions->transform(function ($s) {
+            $s->etag = md5($s->updated_at);
+            return $s;
+        });
 
         return response()->json([
             'success' => true,

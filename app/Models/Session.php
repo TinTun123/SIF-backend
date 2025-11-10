@@ -12,6 +12,8 @@ class Session extends Model
 
     protected $fillable = ['course_id', 'title_eng', 'title_bur', 'content_eng', 'content_bur', 'number'];
 
+    protected $touches = ['course'];
+
     public function course(): BelongsTo
     {
         return $this->belongsTo(Course::class);

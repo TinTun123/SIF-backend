@@ -40,6 +40,7 @@ Route::post('policies/delta-sync', [PolicyController::class, 'deltaSync']);
 
 Route::prefix('courses')->group(function () {
     Route::get('/', [CourseController::class, 'index']);
+    Route::post('/delta-sync', [CourseController::class, 'deltaSync']);
     Route::get('/{id}', [CourseController::class, 'get']);
 });
 
@@ -49,14 +50,23 @@ Route::get('courses/sessions/{id}', [CourseController::class, 'sessionsData']);
 // Fetch one session base on id with content
 Route::get('/sessions/{id}', [CourseController::class, 'getSession']);
 
+// Data sync sessions
+Route::post('sessions/delta-sync', [CourseController::class, 'deltaSyncSession']);
 
-// Fetch every subsession of particular session including content
+// Fetch every session of particular course including content
 Route::get('sessions/all/{id}', [CourseController::class, 'sessionAll']);
 
-Route::prefix('subsessions')->group(function () {
-    // Fetch every subsession of particular session including content
-    Route::get('all/{id}', [SubsessionController::class, 'subSessionAll']);
-});
+// Fetch every subsession of particular session including content
+Route::get('subsessions/all/{id}', [SubsessionController::class, 'subSessionAll']);
+
+// Data sync Subsessions
+Route::post('subsessions/delta-sync', [SubsessionController::class, 'deltaSync']);
+
+// Fetch record of single subsession
+Route::get('subsessions/{subSessionId}', [SubsessionController::class, 'getSubsession']);
+
+// Fetch a every subsession of certain sessionID without content
+Route::get('sessions/subSession/{sessionId}', [SubsessionController::class, 'subsessionData']);
 
 Route::get('stories/', [StoryController::class, 'index']);
 Route::get('stories/{story}', [StoryController::class, 'getStory']);
@@ -87,18 +97,13 @@ Route::get('posters/{poster}', [PosterController::class, 'getPoster']);
 
 Route::get('interviews/', [InterviewController::class, 'index']);
 Route::get('interviews/{interview}', [InterviewController::class, 'getInterview']);
+Route::post('interviews/delta-sync', [InterviewController::class, 'deltaSync']);
 
 Route::get('podcasts/', [PodcastController::class, 'index']);
 Route::get('podcasts/{podcast}', [PodcastController::class, 'getPodcast']);
 
 Route::get('episodes/', [EpisodeController::class, 'index']);
 Route::get('episodes/{podcast}', [EpisodeController::class, 'getEpisodes']);
-
-// Fetch record of single subsession
-Route::get('subsessions/{subSessionId}', [SubsessionController::class, 'getSubsession']);
-
-// Fetch a every subsession of certain sessionID without content
-Route::get('sessions/subSession/{sessionId}', [SubsessionController::class, 'subsessionData']);
 
 
 Route::post('/login', [AuthController::class, 'login']);
@@ -113,9 +118,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/policies', [PolicyController::class, 'store']);
     Route::put('/policies/{policy}', [PolicyController::class, 'update']);
 
-    Route::post('courses/', [CourseController::class, 'store']);
-    Route::put('courses/{id}', [CourseController::class, 'update']);
-    Route::delete('courses/{id}', [CourseController::class, 'destroy']);
     // Course
     Route::post('courses/', [CourseController::class, 'store']);
     Route::put('courses/{id}', [CourseController::class, 'update']);

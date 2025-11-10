@@ -18,6 +18,8 @@ class Subsession extends Model
         'content_bur',
     ];
 
+    protected $touches = ['session'];
+
     public function session()
     {
         return $this->belongsTo(Session::class);

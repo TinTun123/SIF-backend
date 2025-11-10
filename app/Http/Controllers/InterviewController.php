@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Interview;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -15,12 +16,58 @@ class InterviewController extends Controller
     public function index()
     {
         //
-        $interview = Interview::select('id', 'quote', 'date', 'tags', 'type', 'persons', 'videoFile')->get();
+        $interview = Interview::select('id', 'quote', 'date', 'tags', 'type', 'persons', 'videoFile', 'updated_at')->get();
+
+        // Add individual record etags
+        $interview->transform(function ($s) {
+            $s->etag = md5($s->updated_at);
+            return $s;
+        });
+
         return response()->json([
             'success' => true,
             'interviews' => $interview,
         ], 200);
     }
+
+
+    public function deltaSync(Request $request)
+    {
+        $clientRecords = $request->json()->all(); // [{id, etag}]
+        $clientMap = collect($clientRecords)->pluck('etag', 'id');
+
+        // Get all existing statements
+        $allStatements = Interview::select('id', 'quote', 'date', 'tags', 'type', 'persons', 'videoFile', 'updated_at')->get();
+
+        // Determine new and updated separately
+        $added = $allStatements->filter(function ($stmt) use ($clientMap) {
+            return !isset($clientMap[$stmt->id]); // new to client
+        })->values();
+
+        $updated = $allStatements->filter(function ($stmt) use ($clientMap) {
+            $currentEtag = md5($stmt->updated_at);
+            return isset($clientMap[$stmt->id]) && $clientMap[$stmt->id] !== $currentEtag;
+        })->values();
+
+        $added->transform(function ($stmt) {
+            $stmt->etag = md5($stmt->updated_at);
+            return $stmt;
+        });
+
+        $updated->transform(function ($stmt) {
+            $stmt->etag = md5($stmt->updated_at);
+            return $stmt;
+        });
+
+        $deletedIds = $clientMap->keys()->diff($allStatements->pluck('id'));
+
+        return response()->json([
+            'added' => $added->values(),
+            'updated' => $updated->values(),
+            'deleted' => $deletedIds->values(),
+        ]);
+    }
+
 
     public function getInterview(Request $request, Interview $interview)
     {
@@ -95,12 +142,15 @@ class InterviewController extends Controller
         // Handle file upload
         if ($request->hasFile('videoFile')) {
 
-            if ($interview->cover_url) {
-                $oldPath = str_replace('/storage/', 'interviews/', $interview->videoFile);
-                if (Storage::exists($oldPath)) {
-                    Storage::delete($oldPath);
-                }
+            $publicPath = $interview->videoFile;
+            $oldPath = str_replace(asset('/storage/'), '', $publicPath);
+
+
+            if (Storage::disk('public')->exists($oldPath)) {
+                Log::info("Oldpath to delete : ", [$oldPath]);
+                Storage::disk('public')->delete($oldPath);
             }
+
 
             $coverUrl = null;
             // Store new image
@@ -138,16 +188,16 @@ class InterviewController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Interview $poem)
+    public function destroy(Interview $interview)
     {
         // Delete cover image if exists
-        if ($poem->cover_url) {
-            $coverPath = str_replace(asset('/storage/'), '', $poem->cover_url);
+        if ($interview->videoFile) {
+            $coverPath = str_replace(asset('/storage/'), '', $interview->videoFile);
             Storage::disk('public')->delete($coverPath);
         }
 
         // Delete course
-        $poem->delete();
+        $interview->delete();
 
         return response()->json([
             'success' => true,

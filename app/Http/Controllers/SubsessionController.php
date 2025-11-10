@@ -33,10 +33,52 @@ class SubsessionController extends Controller
             ->orderBy('number', 'asc')
             ->get();
 
+        $subsessions->transform(function ($s) {
+            $s->etag = md5($s->updated_at);
+            return $s;
+        });
+
         return response()->json([
             'success' => true,
             'subsessions' => $subsessions,
         ], 200);
+    }
+
+    public function deltaSync(Request $request)
+    {
+        $clientRecords = $request->json()->all(); // [{id, etag}]
+        $clientMap = collect($clientRecords)->pluck('etag', 'id');
+
+        // Get all existing statements
+        $allSubSessions = Subsession::get();
+
+        // Determine new and updated separately
+        $added = $allSubSessions->filter(function ($stmt) use ($clientMap) {
+            return !isset($clientMap[$stmt->id]); // new to client
+        })->values();
+
+        $updated = $allSubSessions->filter(function ($stmt) use ($clientMap) {
+            $currentEtag = md5($stmt->updated_at);
+            return isset($clientMap[$stmt->id]) && $clientMap[$stmt->id] !== $currentEtag;
+        })->values();
+
+        $added->transform(function ($stmt) {
+            $stmt->etag = md5($stmt->updated_at);
+            return $stmt;
+        });
+
+        $updated->transform(function ($stmt) {
+            $stmt->etag = md5($stmt->updated_at);
+            return $stmt;
+        });
+
+        $deletedIds = $clientMap->keys()->diff($allSubSessions->pluck('id'));
+
+        return response()->json([
+            'addedSubSec' => $added->values(),
+            'updatedSubSec' => $updated->values(),
+            'deletedSubSec' => $deletedIds->values(),
+        ]);
     }
 
     /**
