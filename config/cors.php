@@ -15,17 +15,18 @@ return [
     |
     */
 
+    'paths' => ['api/*', 'sanctum/csrf-cookie', 'public/*', 'storage/*'],
 
-    'paths' => ['api/*', 'sanctum/csrf-cookie', 'storage/*', 'public/*'],
     'allowed_methods' => ['*'],
 
     'allowed_origins' => [
-        'http://127.0.0.1:4173',
-        'http://localhost:4173',
-        'http://localhost:5173',
-        'http://127.0.0.1:5173',
-        'http://localhost:5174',
-        'http://127.0.0.1:5174',
+        'https://frontend.mef-myanmar.com',
+        'https://admin.mef-myanmar.com',
+        // 'http://127.0.0.1:4173',
+        // 'http://localhost:5173',
+        // 'http://127.0.0.1:5173',
+        // 'http://localhost:5174',
+        // 'http://127.0.0.1:5174',
     ],
 
     'allowed_origins_patterns' => [],
