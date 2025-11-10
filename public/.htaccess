@@ -22,18 +22,17 @@
     RewriteRule ^ index.php [L]
 </IfModule>
 
-# <IfModule mod_headers.c>
-#     Header set Access-Control-Allow-Origin "https://frontend.mef-myanmar.com/"
-# </IfModule>
-
 <IfModule mod_headers.c>
-    # Match multiple allowed origins and capture full match
-    SetEnvIfNoCase Origin "https?://(www\.)?(frontend\.mef-myanmar\.com|admin\.mef-myanmar\.com)$" AccessControlAllowOrigin=$0
 
-    # Set the Access-Control-Allow-Origin header if env variable exists
-    Header set Access-Control-Allow-Origin "%{AccessControlAllowOrigin}e" env=AccessControlAllowOrigin
-    Header always set Access-Control-Allow-Credentials "true" env=AccessControlAllowOrigin
+    Header set Access-Control-Allow-Origin "http://localhost:5173"
 
-    # Ensure caching proxies vary by Origin
-    Header always set Vary "Origin"
+    # # Match localhost with specific ports: 5173, 5174, 4173, 4174
+    # SetEnvIfNoCase Origin "^https?://localhost:(5173|5174|4173|4174)$" AccessControlAllowOrigin=$0
+
+    # # Set the Access-Control-Allow-Origin header only when matched
+    # Header set Access-Control-Allow-Origin "%{AccessControlAllowOrigin}e" env=AccessControlAllowOrigin
+    # Header always set Access-Control-Allow-Credentials "true" env=AccessControlAllowOrigin
+
+    # # Ensure caching proxies differentiate by Origin
+    # Header always set Vary "Origin"
 </IfModule>

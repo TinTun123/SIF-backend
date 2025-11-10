@@ -37,6 +37,7 @@ class VideoController extends Controller
     {
         $request->validate([
             'video' => 'required|file|mimes:mp4,mov,avi,webm',
+            'thumbnail' => 'required|file|mimes:jpg,jpeg,png',
             'playlist' => 'nullable|string|max:255',
         ]);
 
@@ -52,19 +53,11 @@ class VideoController extends Controller
 
         $videoUrl = Storage::url($path);
 
-        // Generate thumbnail
-        $thumbnailName = Str::uuid() . '.jpg';
-        $thumbnailPath = "public/thumbnails/{$thumbnailName}";
-
-        // Extract frame at 5 seconds
-        FFMpeg::fromDisk('public')
-            ->open("videos/{$filename}")
-            ->getFrameFromSeconds(5)
-            ->export()
-            ->toDisk('public')
-            ->save("thumbnails/{$thumbnailName}");
-
-        $thumbnailUrl = Storage::url($thumbnailPath);
+        // ✅ Save thumbnail
+        $thumbFile = $request->file('thumbnail');
+        $thumbName = Str::uuid() . '.' . $thumbFile->getClientOriginalExtension();
+        $thumbPath = $thumbFile->storeAs('public/thumbnails', $thumbName);
+        $thumbnailUrl = Storage::url($thumbPath);
 
         // Save to DB
         $video = \App\Models\Video::create([
