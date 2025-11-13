@@ -185,4 +185,23 @@ class SubsessionController extends Controller
             'new' => $new,
         ]);
     }
+
+    public function destroy(Subsession $subsession)
+    {
+        // Get course ID and the deleted session's number before deleting
+        $sessionId = $subsession->session_id;
+        $deletedNumber = $subsession->number;
+
+        // Delete the session
+        $subsession->delete();
+
+        // Shift down all sessions with higher numbers in the same course
+        Subsession::where('session_id', $sessionId)
+            ->where('number', '>', $deletedNumber)
+            ->decrement('number');
+
+        return response()->json([
+            'message' => 'Subsession deleted and order updated successfully.',
+        ]);
+    }
 }

@@ -319,4 +319,23 @@ class CourseController extends Controller
             'message' => 'Course and its sessions have been deleted.',
         ], 200);
     }
+
+    public function deleteSession(Session $session)
+    {
+        // Get course ID and the deleted session's number before deleting
+        $courseId = $session->course_id;
+        $deletedNumber = $session->number;
+
+        // Delete the session
+        $session->delete();
+
+        // Shift down all sessions with higher numbers in the same course
+        Session::where('course_id', $courseId)
+            ->where('number', '>', $deletedNumber)
+            ->decrement('number');
+
+        return response()->json([
+            'message' => 'Session deleted and order updated successfully.',
+        ]);
+    }
 }
