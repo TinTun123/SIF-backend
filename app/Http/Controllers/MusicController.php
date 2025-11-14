@@ -15,7 +15,14 @@ class MusicController extends Controller
     public function index()
     {
         //
-        $musics = Music::select('id', 'title', 'links', 'tags', 'file_url', 'date', 'file_url')->get();
+        $musics = Music::select('id', 'title', 'links', 'tags', 'file_url', 'date', 'file_url', 'updated_at')->get();
+
+        // Add individual record etags
+        $musics->transform(function ($s) {
+            $s->etag = md5($s->updated_at);
+            return $s;
+        });
+
         return response()->json([
             'success' => true,
             'musics' => $musics,
@@ -28,6 +35,44 @@ class MusicController extends Controller
             'success' => true,
             'music' => $music,
         ], 200);
+    }
+
+
+    public function deltaSync(Request $request)
+    {
+        $clientRecords = $request->json()->all(); // [{id, etag}]
+        $clientMap = collect($clientRecords)->pluck('etag', 'id');
+
+        // Get all existing statements
+        $allStatements = Music::get();
+
+        // Determine new and updated separately
+        $added = $allStatements->filter(function ($stmt) use ($clientMap) {
+            return !isset($clientMap[$stmt->id]); // new to client
+        })->values();
+
+        $updated = $allStatements->filter(function ($stmt) use ($clientMap) {
+            $currentEtag = md5($stmt->updated_at);
+            return isset($clientMap[$stmt->id]) && $clientMap[$stmt->id] !== $currentEtag;
+        })->values();
+
+        $added->transform(function ($stmt) {
+            $stmt->etag = md5($stmt->updated_at);
+            return $stmt;
+        });
+
+        $updated->transform(function ($stmt) {
+            $stmt->etag = md5($stmt->updated_at);
+            return $stmt;
+        });
+
+        $deletedIds = $clientMap->keys()->diff($allStatements->pluck('id'));
+
+        return response()->json([
+            'added' => $added->values(),
+            'updated' => $updated->values(),
+            'deleted' => $deletedIds->values(),
+        ]);
     }
 
     /**

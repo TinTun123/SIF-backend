@@ -83,6 +83,7 @@ Route::get('poems/{poem}', [PoemController::class, 'getPoem']);
 
 Route::get('musics/', [MusicController::class, 'index']);
 Route::get('musics/{music}', [MusicController::class, 'getMusic']);
+Route::post('musics/delta-sync', [MusicController::class, 'deltaSync']);
 
 Route::get('comics/', [ComicsController::class, 'index']);
 Route::get('comics/{comic}', [ComicsController::class, 'getComics']);
