@@ -68,7 +68,7 @@ class AuthController extends Controller
     public function update(Request $request, User $user)
     {
         $validated = $request->validate([
-            'username' => 'required|string|max:255|unique:users,name',
+            'username' => 'nullable|string|max:255|unique:users,name',
             'level' => 'required|integer|min:0|max:3',
             'password' => 'nullable|string|min:8|confirmed', // 'confirmed' expects 'password_confirmation'
         ]);
@@ -78,7 +78,7 @@ class AuthController extends Controller
         }
 
         $user->update([
-            'name' => $validated['username'],
+            'name' => $validated['username'] || $user->name,
             'level' => $validated['level'],
             'password' =>  isset($validated['password']) ? Hash::make($validated['password']) : $user->password,
         ]);
