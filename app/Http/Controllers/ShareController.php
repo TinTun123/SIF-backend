@@ -16,7 +16,7 @@ class ShareController extends Controller
 
         // If NOT crawler → redirect user to the frontend SPA
         if (!Crawler::isCrawler($userAgent)) {
-            return redirect()->to(config('services.frontend.url') . "/viewArticle/" . $article->id);
+            return redirect()->to(config('services.frontend.url') . "viewArticle/" . $article->id);
         }
 
         // If crawler → return OG meta blade view
