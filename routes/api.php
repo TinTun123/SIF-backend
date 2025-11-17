@@ -190,9 +190,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::put('/user/{user}', [AuthController::class, 'update']);
     Route::delete('/user/{user}', [AuthController::class, 'destroy']);
+
+    Route::post('/register', [AuthController::class, 'register']);
 });
 
-Route::post('/register', [AuthController::class, 'register']);
+
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ShareController;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 
@@ -13,3 +14,6 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+
+// web.php
+Route::get('/share/article/{article}', [ShareController::class, 'article']);
