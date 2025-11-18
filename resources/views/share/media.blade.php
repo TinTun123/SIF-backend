@@ -10,7 +10,7 @@
     <meta property="og:image" content="{{ $interview->thumbnail }}">
     <meta property="og:url" content="{{ url()->current() }}">
     <meta property="og:type" content="video.other">
-    <meta property="og:video" content="https://api.sif-mm.org/storage/interviews/638dcb03-156e-44ae-90d3-cc64940433e1.mp4">
+    <meta property="og:video" content="https://www.facebook.com/video/embed?video_id=833206546133750">
     <meta property="og:video:type" content="text/html">
 
 
