@@ -20,7 +20,7 @@
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
 
-    <title>{{ $statement->title }}</title>
+    <title>{{ $interview->quote }}</title>
 </head>
 
 <body>
