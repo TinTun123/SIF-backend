@@ -12,7 +12,7 @@ $firstImage = $images[0] ?? null;
     <!-- Required OG tags -->
     <meta property="og:title" content="{{ $statement->title }}">
     <meta property="og:description" content="{{ $statement->date }}">
-    <meta property="og:image" content="{{ firstImage }}">
+    <meta property="og:image" content="{{ $firstImage }}">
     <meta property="og:url" content="{{ url()->current() }}">
     <meta property="og:type" content="article">
 
