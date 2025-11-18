@@ -18,3 +18,4 @@ use Illuminate\Support\Facades\Route;
 // web.php
 Route::get('/share/article/{article}', [ShareController::class, 'article']);
 Route::get('/share/statement/{statement}', [ShareController::class, 'statement']);
+Route::get('/share/poster/{poster}', [ShareController::class, 'poster']);

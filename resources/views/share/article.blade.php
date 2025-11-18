@@ -9,6 +9,9 @@
     <meta property="og:description" content="{{ Str::limit(strip_tags($article->description), 140) }}">
     <meta property="og:image" content="{{ $article->cover_url }}">
     <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="article:published_time" content="{{ $article->date }}">
+    <meta property="article:author" content="{{ $article->author }}">
+    <meta property="article:section" content="Politics">
     <meta property="og:type" content="article">
 
     <!-- Facebook app ID -->
