@@ -5,14 +5,18 @@
     <meta charset="UTF-8">
 
     <!-- Required OG tags -->
-    <meta property="og:title" content="{{ $interview->quote }}">
-    <meta property="og:description" content="{{ $interview->type }}">
-    <meta property="og:image" content="{{ $interview->thumbnail }}">
+    <meta property="og:title" content="TESTING TITLE">
+    <meta property="og:description" content="TESTING DESCRIPTION">
+    <!-- <meta property="og:image" content="{{ $interview->thumbnail }}"> -->
     <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:type" content="video.other">
-    <meta property="og:video" content="https://www.facebook.com/video/embed?video_id=833206546133750">
-    <meta property="og:video:type" content="text/html">
-
+    <meta property="og:type" content="video">
+    <meta property="og:video" content="https://api.sif-mm.org/storage/thumbnails/db012cc1-6d56-47f7-810d-42a62b09bd64.jpg">
+    <meta property="og:video:url" content="https://api.sif-mm.org/storage/thumbnails/db012cc1-6d56-47f7-810d-42a62b09bd64.jpg">
+    <meta property="og:video:secure_url" content="https://api.sif-mm.org/storage/thumbnails/db012cc1-6d56-47f7-810d-42a62b09bd64.jpg">
+    <meta property="og:video:type" content="video/mp4">
+    <meta property="og:video:width" content="1280">
+    <meta property="og:video:height" content="720">
+    <meta property="og:image" content="https://api.sif-mm.org/storage/thumbnails/db012cc1-6d56-47f7-810d-42a62b09bd64.jpg">
 
     <!-- Facebook app ID -->
     <meta property="fb:app_id" content="{{ config('services.facebook.app_id') }}">
