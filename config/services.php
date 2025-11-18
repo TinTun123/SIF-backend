@@ -34,7 +34,9 @@ return [
         'url' => env('FRONTEND_URL')
     ],
     'facebook' => [
-        'app_id' => env('FACEBOOK_APP_ID')
+        'app_id' => env('FACEBOOK_APP_ID'),
+        'page_access_token' => env('FACEBOOK_PAGE_TOKEN'),
+        'page_id' => env('FACEBOOK_PAGE_ID')
     ]
 
 ];

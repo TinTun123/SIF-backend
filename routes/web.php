@@ -19,3 +19,4 @@ use Illuminate\Support\Facades\Route;
 Route::get('/share/article/{article}', [ShareController::class, 'article']);
 Route::get('/share/statement/{statement}', [ShareController::class, 'statement']);
 Route::get('/share/poster/{poster}', [ShareController::class, 'poster']);
+Route::get('/share/media/{media}', [ShareController::class, 'media']);

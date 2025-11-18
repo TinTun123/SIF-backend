@@ -8,5 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class Interview extends Model
 {
     use HasFactory;
-    protected $fillable = ['quote', 'date', 'persons', 'tags', 'type', 'videoFile'];
+    protected $fillable = ['quote', 'date', 'persons', 'tags', 'type', 'videoFile', 'thumbnail'];
 }

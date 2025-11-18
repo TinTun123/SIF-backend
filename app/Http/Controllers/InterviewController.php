@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Interview;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use App\Services\MetaVideoService;
 
 class InterviewController extends Controller
 {
@@ -80,7 +82,7 @@ class InterviewController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(Request $request)
+    public function create(Request $request,  MetaVideoService $meta)
     {
         //
         $validated = $request->validate([
@@ -90,9 +92,15 @@ class InterviewController extends Controller
             'date' => 'required|date|before_or_equal:today',
             'videoFile' => 'required|file|mimes:mp4,mov,avi,webm', // or 'file|mimetypes:video/*' if uploading file directly
             'quote' => 'nullable|string',
+            'thumbnail' => 'required|file|mimes:jpg,jpeg,png',
+            'FbEnabled' => 'required|boolean',
+            'FbMessage' => 'nullable|string'
         ]);
 
+
+
         $coverUrl = null;
+        $filename = null;
 
         // Handle file upload
         if ($request->hasFile('videoFile')) {
@@ -107,6 +115,12 @@ class InterviewController extends Controller
             $coverUrl = Storage::url($path); // generates /storage/covers/xxxx.jpg
             // Optional: full URL if needed
             $coverUrl = asset($coverUrl);
+
+            $thumbFile = $request->file('thumbnail');
+            $thumbName = Str::uuid() . '.' . $thumbFile->getClientOriginalExtension();
+            $thumbPath = $thumbFile->storeAs('public/thumbnails', $thumbName);
+            $thumbnailUrl = Storage::url($thumbPath);
+            $thumbnailUrl = asset($thumbnailUrl);
         }
 
 
@@ -116,8 +130,32 @@ class InterviewController extends Controller
             'type' => $validated['type'],
             'date' => $validated['date'],
             'quote' => $validated['quote'],
-            'videoFile' => $coverUrl
+            'videoFile' => $coverUrl,
+            'thumbnail' => $thumbnailUrl
         ]);
+
+
+        // Facebook posting/upload
+        $fbAccessToken = config('services.facebook.page_access_token'); // or wherever you store it
+        $fbAppId = config('services.facebook.app_id');
+
+        // $fileHandle = $meta->uploadVideoToMeta(storage_path('app/public/interviews/' . $filename), $filename);
+
+
+        if ($validated['FbEnabled']) {
+            // POST video with message
+            $videoId = $meta->publishPublicVideo($coverUrl, $validated['quote'], $validated['FbMessage']);
+        } else {
+
+            // Publish silently (not shown on page)
+            $videoId = $meta->publishSilentVideo($coverUrl);
+        }
+
+
+
+        // Store FB video ID
+        $interview->fb_video_id = $videoId;
+        $interview->save();
 
         return response()->json([
             'success' => true,
@@ -135,6 +173,7 @@ class InterviewController extends Controller
             'date' => 'required|date|before_or_equal:today',
             'videoFile' => 'nullable|file|mimes:mp4,mov,avi,webm', // or 'file|mimetypes:video/*' if uploading file directly
             'quote' => 'nullable|string',
+            'thumbnail' => 'nullable|file|mimes:jpg,jpeg,png',
         ]);
 
         $coverUrl = null;
@@ -167,6 +206,20 @@ class InterviewController extends Controller
             $coverUrl = Storage::url($path); // generates /storage/covers/xxxx.jpg
             // Optional: full URL if needed
             $coverUrl = asset($coverUrl);
+
+            $thumbPublicPath = $interview->thumbnail;
+            $oldPath = str_replace(asset('/storage/'), '', $thumbPublicPath);
+
+            if (Storage::disk('public')->exists($oldPath)) {
+                Log::info("Oldpath to delete : ", [$oldPath]);
+                Storage::disk('public')->delete($oldPath);
+            }
+
+            $thumbFile = $request->file('thumbnail');
+            $thumbName = Str::uuid() . '.' . $thumbFile->getClientOriginalExtension();
+            $thumbPath = $thumbFile->storeAs('public/thumbnails', $thumbName);
+            $thumbnailUrl = Storage::url($thumbPath);
+            $thumbnailUrl = asset($thumbnailUrl);
         }
 
 
@@ -177,6 +230,7 @@ class InterviewController extends Controller
             'date' => $validated['date'],
             'quote' => $validated['quote'] ?? null,
             'videoFile' => $coverUrl ?? $interview->videoFile,
+            'thumbnail' => $thumbnailUrl  ?? $interview->thumbnail
         ]);
 
         return response()->json([

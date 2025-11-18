@@ -9,5 +9,5 @@ class Music extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title', 'file_url', 'date', 'links', 'tags'];
+    protected $fillable = ['title', 'file_url', 'date', 'links', 'tags', 'thumbnail'];
 }
