@@ -71,7 +71,7 @@ class ShareController extends Controller
         }
 
         // If crawler → return OG meta blade view
-        return response()->view('share.interview', [
+        return response()->view('share.media', [
             'interview' => $interview
         ]);
     }

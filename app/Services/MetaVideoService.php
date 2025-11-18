@@ -74,7 +74,8 @@ class MetaVideoService
             [
                 'access_token' => $this->pageAccessToken,
                 'file_url' => $filePublicURL,
-                'published' => 'false',
+                'published' => 'true',
+                'no_story' => 'true'
             ]
         );
 
