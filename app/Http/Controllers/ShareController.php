@@ -113,7 +113,7 @@ class ShareController extends Controller
         ]);
     }
 
-    public function course(Request $request, Course $course)
+    public function courses(Request $request, Course $course)
     {
 
         $userAgent = $request->header('User-Agent');
