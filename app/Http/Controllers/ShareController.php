@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Helpers\Crawler;
 use App\Models\Article;
 use App\Models\Interview;
+use App\Models\Music;
 use App\Models\Poster;
 use App\Models\Statement;
 use Illuminate\Http\Request;
@@ -75,6 +76,22 @@ class ShareController extends Controller
         // If crawler → return OG meta blade view
         return response()->view('share.media', [
             'interview' => $interview
+        ]);
+    }
+
+    public function music(Request $request, Music $music)
+    {
+
+        $userAgent = $request->header('User-Agent');
+
+        // If NOT crawler → redirect user to the frontend SPA
+        if (!Crawler::isCrawler($userAgent)) {
+            return redirect()->to(config('services.frontend.url') . "ArtMovements/Musics");
+        }
+
+        // If crawler → return OG meta blade view
+        return response()->view('share.music', [
+            'music' => $music
         ]);
     }
 }
