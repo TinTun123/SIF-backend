@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\Crawler;
 use App\Models\Article;
+use App\Models\Course;
 use App\Models\Interview;
 use App\Models\Music;
 use App\Models\Policy;
@@ -109,6 +110,22 @@ class ShareController extends Controller
         // If crawler → return OG meta blade view
         return response()->view('share.policy', [
             'policy' => $policy
+        ]);
+    }
+
+    public function course(Request $request, Course $course)
+    {
+
+        $userAgent = $request->header('User-Agent');
+
+        // If NOT crawler → redirect user to the frontend SPA
+        if (!Crawler::isCrawler($userAgent)) {
+            return redirect()->to(config('services.frontend.url') . "course/$course->id");
+        }
+        Log::info("course : ", [$course]);
+        // If crawler → return OG meta blade view
+        return response()->view('share.course', [
+            'course' => $course
         ]);
     }
 }
