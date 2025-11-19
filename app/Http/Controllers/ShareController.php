@@ -88,7 +88,7 @@ class ShareController extends Controller
         if (!Crawler::isCrawler($userAgent)) {
             return redirect()->to(config('services.frontend.url') . "ArtMovements/Musics");
         }
-
+        Log::info("Music : ", [$music]);
         // If crawler → return OG meta blade view
         return response()->view('share.music', [
             'music' => $music

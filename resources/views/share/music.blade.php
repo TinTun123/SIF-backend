@@ -7,7 +7,6 @@
     <!-- Required OG tags -->
     <meta property="og:title" content="{{ $music->title }}">
     <meta property="og:description" content="ART MOVEMENT">
-    <!-- <meta property="og:image" content="{{ $interview->thumbnail }}"> -->
     <meta property="og:url" content="{{ url()->current() }}">
     <meta property="og:type" content="video">
     <meta property="og:image" content="{{ $music->thumbnail }}">
@@ -18,7 +17,7 @@
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
 
-    <title>{{ $music->quote }}</title>
+    <title>{{ $music->title }}</title>
 </head>
 
 <body>
