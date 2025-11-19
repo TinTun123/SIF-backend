@@ -193,27 +193,77 @@ class CourseController extends Controller
             'cover_url' => $coverUrl,
         ]);
 
-        if (!empty($validated['sessions'])) {
-            $sessionsArray = json_decode($validated['sessions'], true); // decode JSON string to array
+        // if (!empty($validated['sessions'])) {
+        //     $sessionsArray = json_decode($validated['sessions'], true); // decode JSON string to array
 
-            if (is_array($sessionsArray)) {
-                foreach ($sessionsArray as $s) {
-                    $course->sessions()->create([
-                        'title_eng' => $s['title_eng'] ?? '',
-                        'title_bur' => $s['title_bur'] ?? '',
-                        'content_eng' => $s['content_eng'] ?? '',
-                        'content_bur' => $s['content_bur'] ?? '',
-                        'number' => $s['number'] ?? 0
-                    ]);
-                }
-            }
-        }
+        //     if (is_array($sessionsArray)) {
+        //         foreach ($sessionsArray as $s) {
+        //             $course->sessions()->create([
+        //                 'title_eng' => $s['title_eng'] ?? '',
+        //                 'title_bur' => $s['title_bur'] ?? '',
+        //                 'content_eng' => $s['content_eng'] ?? '',
+        //                 'content_bur' => $s['content_bur'] ?? '',
+        //                 'number' => $s['number'] ?? 0
+        //             ]);
+        //         }
+        //     }
+        // }
 
-        $course['sessions_count'] = sizeof($sessionsArray);
+        // $course['sessions_count'] = sizeof($sessionsArray);
 
         return response()->json([
             'success' => true,
             'course' => $course,
+        ], 200);
+    }
+
+    public function storeSession(Request $request, Course $course)
+    {
+        $validated = $request->validate([
+            'title_eng' => 'required|string',
+            'title_bur' => 'required|string',
+            'content_eng' => 'required|string',
+            'content_bur' => 'required|string',
+            'number' => 'required|numeric|min:0',
+        ]);
+
+        $course->sessions()->create([
+            'title_eng' => $validated['title_eng'],
+            'title_bur' => $validated['title_bur'],
+            'content_eng' => $validated['content_eng'],
+            'content_bur' => $validated['content_bur'],
+            'number' => $validated['number']
+        ]);
+
+
+        return response()->json([
+            'success' => true,
+            'course' => $course,
+        ], 200);
+    }
+
+    public function updateSession(Request $request, Course $course, Session $session)
+    {
+
+        $validated = $request->validate([
+            'title_eng' => 'required|string',
+            'title_bur' => 'required|string',
+            'content_eng' => 'required|string',
+            'content_bur' => 'required|string',
+            'number' => 'required|numeric|min:0',
+        ]);
+
+        $session->update([
+            'title_eng' => $validated['title_eng'],
+            'title_bur' => $validated['title_bur'],
+            'content_eng' => $validated['content_eng'],
+            'content_bur' => $validated['content_bur'],
+            'number' => $validated['number']
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'session' => $session,
         ], 200);
     }
 

@@ -94,7 +94,54 @@ class SubsessionController extends Controller
         ], 200);
     }
 
+    public function storeSubSession(Request $request, Session $session)
+    {
+        $validated = $request->validate([
+            'title_eng' => 'required|string',
+            'title_bur' => 'required|string',
+            'content_eng' => 'required|string',
+            'content_bur' => 'required|string',
+            'number' => 'required|numeric|min:0',
+        ]);
 
+        $session->subsessions()->create([
+            'title_eng' => $validated['title_eng'],
+            'title_bur' => $validated['title_bur'],
+            'content_eng' => $validated['content_eng'],
+            'content_bur' => $validated['content_bur'],
+            'number' => $validated['number']
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'session' => $session,
+        ], 200);
+    }
+
+    public function updateSubSession(Request $request, Session $session, Subsession $subSession)
+    {
+        $validated = $request->validate([
+            'title_eng' => 'required|string',
+            'title_bur' => 'required|string',
+            'content_eng' => 'required|string',
+            'content_bur' => 'required|string',
+            'number' => 'required|numeric|min:0',
+        ]);
+
+        $subSession->update([
+            'title_eng' => $validated['title_eng'],
+            'title_bur' => $validated['title_bur'],
+            'content_eng' => $validated['content_eng'],
+            'content_bur' => $validated['content_bur'],
+            'number' => $validated['number']
+        ]);
+
+        Log::info('Subsession : ', [$subSession]);
+        return response()->json([
+            'success' => true,
+            'session' => $session,
+        ], 200);
+    }
     // Store new subsession
     public function store(Request $request)
     {

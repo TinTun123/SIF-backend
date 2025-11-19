@@ -124,6 +124,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('courses/{id}', [CourseController::class, 'update']);
     Route::delete('courses/{id}', [CourseController::class, 'destroy']);
 
+    // Session
+    Route::post('courses/{course}/sessions', [CourseController::class, 'storeSession']);
+    Route::put('courses/{course}/sessions/{session}', [CourseController::class, 'updateSession']);
+
+    // Subsession
+    Route::post('sessions/{session}/subsessions', [SubsessionController::class, 'storeSubSession']);
+    Route::put('sessions/{session}/subsessions/{subSession}', [SubsessionController::class, 'updateSubSession']);
+
     Route::delete('sessions/{session}', [CourseController::class, 'deleteSession']);
 
     // Sub session
