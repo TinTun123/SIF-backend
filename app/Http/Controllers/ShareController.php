@@ -6,6 +6,7 @@ use App\Helpers\Crawler;
 use App\Models\Article;
 use App\Models\Interview;
 use App\Models\Music;
+use App\Models\Policy;
 use App\Models\Poster;
 use App\Models\Statement;
 use Illuminate\Http\Request;
@@ -92,6 +93,22 @@ class ShareController extends Controller
         // If crawler → return OG meta blade view
         return response()->view('share.music', [
             'music' => $music
+        ]);
+    }
+
+    public function policies(Request $request, Policy $policy)
+    {
+
+        $userAgent = $request->header('User-Agent');
+
+        // If NOT crawler → redirect user to the frontend SPA
+        if (!Crawler::isCrawler($userAgent)) {
+            return redirect()->to(config('services.frontend.url') . "policies/$policy->id");
+        }
+        Log::info("policy : ", [$policy]);
+        // If crawler → return OG meta blade view
+        return response()->view('share.policy', [
+            'policy' => $policy
         ]);
     }
 }

@@ -22,3 +22,4 @@ Route::get('/share/poster/{poster}', [ShareController::class, 'poster']);
 Route::get('/share/media/{interview}', [ShareController::class, 'media']);
 
 Route::get('/share/music/{music}', [ShareController::class, 'music']);
+Route::get('/share/policies/{policy}', [ShareController::class, 'policies']);
