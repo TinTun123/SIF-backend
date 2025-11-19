@@ -16,7 +16,8 @@ class Policy extends Model
         'organizations',
         'content_eng',
         'content_bur',
-        'logos'
+        'logos',
+        'thumbnail'
     ];
 
     protected $casts = [

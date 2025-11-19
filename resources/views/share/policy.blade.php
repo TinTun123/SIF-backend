@@ -7,7 +7,7 @@
     <!-- Required OG tags -->
     <meta property="og:title" content="{{ $policy->title_bur }}">
     <meta property="og:description" content="{{ str_replace('#', ' ', Str::limit(strip_tags($policy->organizations), 140)) }}">
-    <meta property="og:image" content="{{  }}">
+    <meta property="og:image" content="{{ $policy->thumbnail }}">
     <meta property="og:url" content="{{ url()->current() }}">
     <meta property="article:published_time" content="{{ $policy->date }}">
     <meta property="og:type" content="article">

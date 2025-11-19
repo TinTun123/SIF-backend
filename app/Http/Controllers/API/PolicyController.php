@@ -24,7 +24,7 @@ class PolicyController extends Controller
         $clientMap = collect($clientRecords)->pluck('etag', 'id');
 
         // Get all existing statements
-        $allpolicies = Policy::select('id', 'title_eng', 'title_bur', 'date', 'organizations', 'logos', 'content_eng', 'content_bur', 'updated_at')->get();
+        $allpolicies = Policy::select('id', 'title_eng', 'title_bur', 'date', 'organizations', 'logos', 'content_eng', 'content_bur', 'updated_at', 'thumbnail')->get();
 
         // Determine new and updated separately
         $added = $allpolicies->filter(function ($ploy) use ($clientMap) {
@@ -71,6 +71,7 @@ class PolicyController extends Controller
             'content_eng' => 'nullable|string',
             'content_bur' => 'nullable|string',
             'logos.*' => 'nullable|file|mimes:jpg,jpeg,png,webp,svg', // validate each file
+            'thumbnail' => 'required|file|mimes:jpg,jpeg,png'
         ]);
 
         // ✅ Step 2: Handle logo uploads
@@ -88,6 +89,15 @@ class PolicyController extends Controller
             }
         }
 
+        if ($request->hasFile('thumbnail')) {
+
+            $thumbFile = $request->file('thumbnail');
+            $thumbName = Str::uuid() . '.' . $thumbFile->getClientOriginalExtension();
+            $thumbPath = $thumbFile->storeAs('public/thumbnails', $thumbName);
+            $thumbnailUrl = Storage::url($thumbPath);
+            $thumbnailUrl = asset($thumbnailUrl);
+        }
+
         // ✅ Step 3: Create the policy record
         $policy = Policy::create([
             'title_eng' => $validated['title_eng'],
@@ -97,6 +107,7 @@ class PolicyController extends Controller
             'logos' => implode('#', $logos),
             'content_eng' => $validated['content_eng'] ?? null,
             'content_bur' => $validated['content_bur'] ?? null,
+            'thumbnail' => $thumbnailUrl
         ]);
 
         // ✅ Step 4: Respond
@@ -120,6 +131,14 @@ class PolicyController extends Controller
                 $path = str_replace(asset('storage'), 'public', $url);
                 Storage::delete($path);
             }
+        }
+
+        $thumbPublicPath = $policy->thumbnail;
+        $oldPath = str_replace(asset('/storage/'), '', $thumbPublicPath);
+
+        if (Storage::disk('public')->exists($oldPath)) {
+            Log::info("Oldpath to delete : ", [$oldPath]);
+            Storage::disk('public')->delete($oldPath);
         }
 
         $policy->delete();
@@ -147,6 +166,7 @@ class PolicyController extends Controller
             'logos.*' => 'nullable|file|mimes:jpg,jpeg,png,webp,svg',
             'existing_logos' => 'nullable|array',
             'existing_logos.*' => 'nullable|string',
+            'thumbnail' => 'nullable|file|mimes:jpg,jpeg,png'
         ]);
 
         // Step 1: Start from logos user kept
@@ -163,6 +183,23 @@ class PolicyController extends Controller
 
                 $logos[] = asset(Storage::url($path));
             }
+        }
+
+        if ($request->hasFile('thumbnail')) {
+
+            $thumbPublicPath = $policy->thumbnail;
+            $oldPath = str_replace(asset('/storage/'), '', $thumbPublicPath);
+
+            if (Storage::disk('public')->exists($oldPath)) {
+                Log::info("Oldpath to delete : ", [$oldPath]);
+                Storage::disk('public')->delete($oldPath);
+            }
+
+            $thumbFile = $request->file('thumbnail');
+            $thumbName = Str::uuid() . '.' . $thumbFile->getClientOriginalExtension();
+            $thumbPath = $thumbFile->storeAs('public/thumbnails', $thumbName);
+            $thumbnailUrl = Storage::url($thumbPath);
+            $thumbnailUrl = asset($thumbnailUrl);
         }
 
         // Step 3: Delete logos that were removed by the user
@@ -182,6 +219,7 @@ class PolicyController extends Controller
             'logos' => implode('#', $logos),
             'content_eng' => $validated['content_eng'] ?? $policy->content_eng,
             'content_bur' => $validated['content_bur'] ?? $policy->content_bur,
+            'thumbnail' => $thumbnailUrl ?? $policy->thumbnail
         ]);
 
         return response()->json([
