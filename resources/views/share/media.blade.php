@@ -6,7 +6,7 @@
 
     <!-- Required OG tags -->
     <meta property="og:title" content="{{ $interview->quote ?? 'PANEL DISCUSSION'}}">
-    <meta property="og:description" content="The Spark">
+    <meta property="og:description" content="{{ $interview->type }}">
     <!-- <meta property="og:image" content="{{ $interview->thumbnail }}"> -->
     <meta property="og:url" content="{{ url()->current() }}">
     <meta property="og:type" content="video">
