@@ -8,6 +8,7 @@ use App\Models\Interview;
 use App\Models\Poster;
 use App\Models\Statement;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class ShareController extends Controller
 {
@@ -69,6 +70,7 @@ class ShareController extends Controller
         if (!Crawler::isCrawler($userAgent)) {
             return redirect()->to(config('services.frontend.url') . "Media/");
         }
+        Log::info('Interview : ', [$interview]);
 
         // If crawler → return OG meta blade view
         return response()->view('share.media', [
