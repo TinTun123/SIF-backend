@@ -18,7 +18,7 @@ class InterviewController extends Controller
     public function index()
     {
         //
-        $interview = Interview::select('id', 'quote', 'date', 'tags', 'type', 'persons', 'videoFile', 'updated_at')->get();
+        $interview = Interview::select('id', 'quote', 'date', 'tags', 'type', 'persons', 'videoFile', 'updated_at', 'thumbnail')->get();
 
         // Add individual record etags
         $interview->transform(function ($s) {
@@ -39,7 +39,7 @@ class InterviewController extends Controller
         $clientMap = collect($clientRecords)->pluck('etag', 'id');
 
         // Get all existing statements
-        $allStatements = Interview::select('id', 'quote', 'date', 'tags', 'type', 'persons', 'videoFile', 'updated_at')->get();
+        $allStatements = Interview::select('id', 'quote', 'date', 'tags', 'type', 'persons', 'videoFile', 'updated_at', 'thumbnail')->get();
 
         // Determine new and updated separately
         $added = $allStatements->filter(function ($stmt) use ($clientMap) {
