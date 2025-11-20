@@ -21,6 +21,8 @@ class MetaVideoService
     public function createLinkPost(string $message, string $sourceurl): array
     {
         $endpoint = "https://graph.facebook.com/v24.0/{$this->pageId}/feed";
+        Log::info("message : ", [$message]);
+        Log::info("SourceURL : ", [$sourceurl]);
 
         try {
             $response = Http::post($endpoint, [
