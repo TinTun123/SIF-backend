@@ -23,7 +23,7 @@ class MetaVideoService
         $endpoint = "https://graph.facebook.com/v24.0/{$this->pageId}/videos";
 
         try {
-            $response = Http::asForm()->post($endpoint, [
+            $response = Http::post($endpoint, [
                 'access_token' => $this->pageAccessToken,
                 'file_url'     => $videoUrl,   // The public video URL
                 'description'  => $message,    // Post caption
