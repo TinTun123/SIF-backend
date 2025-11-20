@@ -22,7 +22,7 @@ class MetaVideoService
     {
         $endpoint = "https://graph.facebook.com/v24.0/{$this->pageId}/videos";
         Log::info('Endpoint : ', [$endpoint]);
-        Log::info("FileURL : ", $videoUrl);
+        Log::info("FileURL : ", [$videoUrl]);
         try {
             $response = Http::post($endpoint, [
                 'access_token' => $this->pageAccessToken,
