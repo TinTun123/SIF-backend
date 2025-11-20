@@ -18,88 +18,43 @@ class MetaVideoService
         $this->pageAccessToken = config('services.facebook.page_access_token');
     }
 
-    /**
-     * Upload a video to Meta (Resumable Upload API)
-     * Returns the uploaded file handle (h)
-     */
-    public function uploadVideoToMeta(string $localPath, string $fileName): string
+    public function createVideoPost(string $videoUrl, string $message): array
     {
-        $fileSize = filesize($localPath);
+        $endpoint = "https://graph.facebook.com/v24.0/{$this->pageId}/videos";
 
-        // Step 1: Start upload session
-        $initResponse = Http::post("https://graph.facebook.com/v24.0/{$this->appId}/uploads", [
-            'file_name'   => $fileName,
-            'file_length' => $fileSize,
-            'file_type'   => 'video/mp4',
-            'access_token' => $this->pageAccessToken,
-        ]);
-        Log::info('initResponse : ', [$initResponse]);
-
-        $sessionId = $initResponse->json('id'); // upload:<UPLOAD_SESSION_ID>
-
-        if (!$sessionId) {
-            throw new \Exception("Failed to start Meta upload session.");
-        }
-
-        // Step 2: Upload video binary
-        $uploadResponse = Http::withHeaders([
-            'Authorization' => "OAuth {$this->pageAccessToken}",
-            'file_offset'   => 0,
-        ])
-            ->withBody(
-                file_get_contents($localPath),
-                'application/octet-stream'
-            )->post("https://graph.facebook.com/v24.0/{$sessionId}");
-
-        Log::info('uploadResponse : ', [$uploadResponse]);
-
-        $fileHandle = $uploadResponse->json('h');
-
-        if (!$fileHandle) {
-            throw new \Exception("Failed to upload video to Meta.");
-        }
-
-        return $fileHandle;
-    }
-
-
-    /**
-     * Publish a video silently (published = false)
-     * Returns video_id
-     */
-    public function publishSilentVideo(string $filePublicURL): ?string
-    {
-        $response = Http::post(
-            "https://graph.facebook.com/v24.0/{$this->pageId}/videos",
-            [
+        try {
+            $response = Http::asForm()->post($endpoint, [
                 'access_token' => $this->pageAccessToken,
-                'file_url' => $filePublicURL,
-                'published' => 'true',
-                'no_story' => 'true'
-            ]
-        );
+                'file_url'     => $videoUrl,   // The public video URL
+                'description'  => $message,    // Post caption
+                'published'    => true,        // Publish immediately
+            ]);
 
-        Log::info("Response : ", [$response]);
+            if ($response->failed()) {
+                Log::error('Facebook Video Upload Failed', [
+                    'status' => $response->status(),
+                    'body'   => $response->body(),
+                ]);
+                return [
+                    'success' => false,
+                    'error'   => $response->json(),
+                ];
+            }
 
-        $videoId = $response->json('id');
+            return [
+                'success'   => true,
+                'video_id'  => $response->json()['id'] ?? null,
+                'result'    => $response->json(),
+            ];
+        } catch (\Exception $e) {
+            Log::error('Facebook Video Upload Exception', [
+                'error' => $e->getMessage(),
+            ]);
 
-        return $videoId;
-    }
-
-
-    /**
-     * Publish a visible video post on the Page
-     */
-    public function publishPublicVideo(string $fileHandle, string $title = '', string $desc = ''): ?string
-    {
-        $publishResponse = Http::asMultipart()->post("https://graph.facebook.com/v24.0/{$this->pageId}/videos", [
-            'access_token' => $this->pageAccessToken,
-            'published' => 'true',
-            'title' => $title,
-            'description' => $desc,
-            'fbuploader_video_file_chunk' => $fileHandle,
-        ]);
-
-        return $publishResponse->json('id');
+            return [
+                'success' => false,
+                'error'   => $e->getMessage(),
+            ];
+        }
     }
 }

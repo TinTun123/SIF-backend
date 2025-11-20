@@ -144,18 +144,8 @@ class InterviewController extends Controller
 
         if ($validated['FbEnabled']) {
             // POST video with message
-            $videoId = $meta->publishPublicVideo($coverUrl, $validated['quote'], $validated['FbMessage']);
-        } else {
-
-            // Publish silently (not shown on page)
-            $videoId = $meta->publishSilentVideo($coverUrl);
+            $videoId = $meta->createVideoPost($coverUrl, $validated["FbMessage"]);
         }
-
-
-
-        // Store FB video ID
-        $interview->fb_video_id = $videoId;
-        $interview->save();
 
         return response()->json([
             'success' => true,
