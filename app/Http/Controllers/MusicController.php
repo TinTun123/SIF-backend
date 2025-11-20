@@ -85,7 +85,6 @@ class MusicController extends Controller
         //
         $validated = $request->validate([
             'title' => 'required|string',
-            'links' => 'required|string',
             'tags' => 'required|string',
             'file_url' => 'required|file|mimetypes:video/mp4,video/avi,video/mpeg,video/quicktime,video/x-ms-wmv',
             'date' => 'required|date|before_or_equal:today',
@@ -145,7 +144,6 @@ class MusicController extends Controller
         //
         $validated = $request->validate([
             'title' => 'required|string',
-            'links' => 'required|string',
             'tags' => 'required|string',
             'file_url' => 'nullable|file|mimetypes:video/mp4,video/avi,video/mpeg,video/quicktime,video/x-ms-wmv',
             'date' => 'required|date|before_or_equal:today',
