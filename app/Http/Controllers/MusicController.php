@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Music;
+use App\Services\MetaVideoService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -79,7 +80,7 @@ class MusicController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(Request $request)
+    public function create(Request $request, MetaVideoService $meta)
     {
         //
         $validated = $request->validate([
@@ -89,6 +90,8 @@ class MusicController extends Controller
             'file_url' => 'required|file|mimetypes:video/mp4,video/avi,video/mpeg,video/quicktime,video/x-ms-wmv',
             'date' => 'required|date|before_or_equal:today',
             'thumbnail' => 'required|file|mimes:jpg,jpeg,png',
+            'FbEnabled' => 'required|boolean',
+            'FbMessage' => 'nullable|string'
         ]);
 
         $coverUrl = null;
@@ -124,6 +127,12 @@ class MusicController extends Controller
             'file_url' => $coverUrl,
             'thumbnail' => $thumbnailUrl
         ]);
+
+
+        if ($validated['FbEnabled']) {
+            // POST video with message
+            $videoId = $meta->createVideoPost($coverUrl, $validated["FbMessage"]);
+        }
 
         return response()->json([
             'success' => true,
@@ -175,7 +184,7 @@ class MusicController extends Controller
             $oldPath = str_replace(asset('/storage/'), '', $thumbPublicPath);
 
             if (Storage::disk('public')->exists($oldPath)) {
-                Log::info("Oldpath to delete : ", [$oldPath]);
+
                 Storage::disk('public')->delete($oldPath);
             }
 

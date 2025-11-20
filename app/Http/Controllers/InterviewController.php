@@ -135,13 +135,6 @@ class InterviewController extends Controller
         ]);
 
 
-        // Facebook posting/upload
-        $fbAccessToken = config('services.facebook.page_access_token'); // or wherever you store it
-        $fbAppId = config('services.facebook.app_id');
-
-        // $fileHandle = $meta->uploadVideoToMeta(storage_path('app/public/interviews/' . $filename), $filename);
-
-
         if ($validated['FbEnabled']) {
             // POST video with message
             $videoId = $meta->createVideoPost($coverUrl, $validated["FbMessage"]);
