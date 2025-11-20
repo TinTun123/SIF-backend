@@ -86,7 +86,7 @@ class MusicController extends Controller
         $validated = $request->validate([
             'title' => 'required|string',
             'tags' => 'required|string',
-            'file_url' => 'required|file|mimetypes:video/mp4,video/avi,video/mpeg,video/quicktime,video/x-ms-wmv',
+            'file_url' => 'required|file|mimes:mp4,mov,avi,webm,wmv,flv,mpeg,mpg',
             'date' => 'required|date|before_or_equal:today',
             'thumbnail' => 'required|file|mimes:jpg,jpeg,png',
             'FbEnabled' => 'required|boolean',
