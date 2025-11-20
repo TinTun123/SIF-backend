@@ -17,7 +17,7 @@ class MusicController extends Controller
     public function index()
     {
         //
-        $musics = Music::select('id', 'title', 'links', 'tags', 'file_url', 'date', 'file_url', 'updated_at')->get();
+        $musics = Music::select('id', 'title', 'tags', 'file_url', 'date', 'file_url', 'updated_at')->get();
 
         // Add individual record etags
         $musics->transform(function ($s) {
@@ -120,7 +120,6 @@ class MusicController extends Controller
 
         $music = Music::create([
             'title' => $validated['title'],
-            'links' => $validated['links'],
             'tags' => $validated['tags'],
             'date' => $validated['date'],
             'file_url' => $coverUrl,
@@ -196,7 +195,6 @@ class MusicController extends Controller
 
         $music->update([
             'title' => $validated['title'],
-            'links' => $validated['links'],
             'tags' => $validated['tags'],
             'file_url' => $coverUrl ?? $music->file_url,
             'thumbnail' => $thumbnailUrl ?? $music->thumbnail
