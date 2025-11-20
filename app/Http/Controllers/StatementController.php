@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Statement;
+use App\Services\MetaVideoService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -76,7 +77,7 @@ class StatementController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(Request $request)
+    public function create(Request $request, MetaVideoService $meta)
     {
         //
         $validated = $request->validate([
@@ -85,6 +86,8 @@ class StatementController extends Controller
             'tags.*' => 'required|string',
             'images.*' => 'nullable|file|mimes:jpg,jpeg,png,webp,svg',
             'date' => 'required|date|before_or_equal:today',
+            'FbEnabled' => 'required|boolean',
+            'FbMessage' => 'nullable|string'
         ]);
 
         $images = [];
@@ -108,6 +111,12 @@ class StatementController extends Controller
             'tags' => json_encode($validated['tags']),
             'images' => json_encode($images),
         ]);
+
+
+        if ($validated['FbEnabled']) {
+            // POST video with message
+            $respond = $meta->createCarousalPost($validated['FbMessage'], $images);
+        }
 
         return response()->json([
             'success' => true,

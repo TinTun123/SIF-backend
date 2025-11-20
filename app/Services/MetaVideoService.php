@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -17,6 +18,44 @@ class MetaVideoService
         $this->pageId = config('services.facebook.page_id');
         $this->pageAccessToken = config('services.facebook.page_access_token');
     }
+
+    public function createCarousalPost(string $message, array $images): array
+    {
+        $uploadedIds = [];
+
+        // 1️⃣ Upload each image unpublished
+        foreach ($images as $imgUrl) {
+            $response = Http::post("https://graph.facebook.com/v24.0/{$this->pageId}/photos", [
+                'url' => $imgUrl,
+                'published' => false,
+                'access_token' => $this->pageAccessToken,
+            ]);
+
+            $data = $response->json();
+            if (isset($data['id'])) {
+                $uploadedIds[] = $data['id'];
+            }
+        }
+        Log::info('uploadIds : ', $uploadedIds);
+
+        if (empty($uploadedIds)) {
+            throw new \Exception("No images uploaded, cannot create carousel post.");
+        }
+
+        // 2️⃣ Create the feed post with attached_media
+        $attachedMedia = array_map(fn($id) => ['media_fbid' => $id], $uploadedIds);
+        Log::info("AttachedMedia : ", $attachedMedia);
+
+        $response = Http::asForm()->post("https://graph.facebook.com/v24.0/{$this->pageId}/feed", [
+            'message' => $message,
+            'attached_media' => json_encode($attachedMedia),
+            'access_token' => $this->pageAccessToken,
+        ]);
+
+        return $response->json();
+    }
+
+
 
     public function createLinkPost(string $message, string $sourceurl): array
     {
