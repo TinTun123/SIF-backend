@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Movement;
+use App\Services\MetaVideoService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -31,7 +32,7 @@ class MovementController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(Request $request)
+    public function create(Request $request, MetaVideoService $meta)
     {
         //
         $validated = $request->validate([
@@ -41,6 +42,8 @@ class MovementController extends Controller
             'story_date' => 'required|date|before_or_equal:today',
             'content_eng' => 'nullable|string',
             'content_bur' => 'nullable|string',
+            'FbEnabled' => 'required|boolean',
+            'FbMessage' => 'nullable|string'
         ]);
 
         $coverUrl = null;
@@ -68,6 +71,11 @@ class MovementController extends Controller
             'content_bur' => $validated['content_bur'] ?? '',
             'cover_url' => $coverUrl,
         ]);
+
+        if ($validated['FbEnabled']) {
+            // POST video with message
+            $respond = $meta->createLinkPost($validated["FbMessage"], url("/share/movement/$movement->id"));
+        }
 
         return response()->json([
             'success' => true,
