@@ -21,15 +21,15 @@ class MetaVideoService
     public function createVideoPost(string $videoUrl, string $message): array
     {
         $endpoint = "https://graph.facebook.com/v24.0/{$this->pageId}/videos";
+        Log::info('Endpoint : ', [$endpoint]);
 
         try {
             $response = Http::post($endpoint, [
                 'access_token' => $this->pageAccessToken,
                 'file_url'     => $videoUrl,   // The public video URL
                 'description'  => $message,    // Post caption
-                'published'    => true,        // Publish immediately
             ]);
-
+            Log::info("Respond : ", [$response]);
             if ($response->failed()) {
                 Log::error('Facebook Video Upload Failed', [
                     'status' => $response->status(),
