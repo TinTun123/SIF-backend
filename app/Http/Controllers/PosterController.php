@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Poster;
+use App\Services\MetaVideoService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -33,12 +34,14 @@ class PosterController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(Request $request)
+    public function create(Request $request, MetaVideoService $meta)
     {
         //
         $validated = $request->validate([
             'images.*' => 'nullable|file|mimes:jpg,jpeg,png,webp,svg',
             'date' => 'required|date|before_or_equal:today',
+            'FbEnabled' => 'required|boolean',
+            'FbMessage' => 'nullable|string'
         ]);
 
         $images = [];
@@ -60,6 +63,11 @@ class PosterController extends Controller
             'date' => $validated['date'],
             'images' => json_encode($images),
         ]);
+
+        if ($validated['FbEnabled']) {
+            // POST video with message
+            $respond = $meta->createCarousalPost($validated['FbMessage'], $images);
+        }
 
         return response()->json([
             'success' => true,
