@@ -28,7 +28,7 @@ class MetaVideoService
             $response = Http::post($endpoint, [
                 'access_token' => $this->pageAccessToken,
                 'link'  => $sourceurl,   // The public video URL
-                'description'  => $message,    // Post caption
+                'message'  => $message,    // Post caption
             ]);
             Log::info("Respond : ", [$response]);
             if ($response->failed()) {
