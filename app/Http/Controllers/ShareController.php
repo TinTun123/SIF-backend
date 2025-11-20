@@ -6,6 +6,7 @@ use App\Helpers\Crawler;
 use App\Models\Article;
 use App\Models\Course;
 use App\Models\Interview;
+use App\Models\Movement;
 use App\Models\Music;
 use App\Models\Policy;
 use App\Models\Poster;
@@ -73,7 +74,7 @@ class ShareController extends Controller
         if (!Crawler::isCrawler($userAgent)) {
             return redirect()->to(config('services.frontend.url') . "Media/");
         }
-        Log::info('Interview : ', [$interview]);
+
 
         // If crawler → return OG meta blade view
         return response()->view('share.media', [
@@ -90,7 +91,7 @@ class ShareController extends Controller
         if (!Crawler::isCrawler($userAgent)) {
             return redirect()->to(config('services.frontend.url') . "ArtMovements/Musics");
         }
-        Log::info("Music : ", [$music]);
+
         // If crawler → return OG meta blade view
         return response()->view('share.music', [
             'music' => $music
@@ -106,7 +107,7 @@ class ShareController extends Controller
         if (!Crawler::isCrawler($userAgent)) {
             return redirect()->to(config('services.frontend.url') . "policies/$policy->id");
         }
-        Log::info("policy : ", [$policy]);
+
         // If crawler → return OG meta blade view
         return response()->view('share.policy', [
             'policy' => $policy
@@ -122,10 +123,27 @@ class ShareController extends Controller
         if (!Crawler::isCrawler($userAgent)) {
             return redirect()->to(config('services.frontend.url') . "course/$course->id");
         }
-        Log::info("course : ", [$course]);
+
         // If crawler → return OG meta blade view
         return response()->view('share.course', [
             'course' => $course
+        ]);
+    }
+
+    public function movement(Request $request, Movement $movement)
+    {
+
+        $userAgent = $request->header('User-Agent');
+
+        // If NOT crawler → redirect user to the frontend SPA
+        if (!Crawler::isCrawler($userAgent)) {
+            return redirect()->to(config('services.frontend.url') . "viewMovements/$movement->id");
+        }
+
+
+        // If crawler → return OG meta blade view
+        return response()->view('share.movement', [
+            'movement' => $movement
         ]);
     }
 }
