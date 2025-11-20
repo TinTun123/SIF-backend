@@ -18,11 +18,48 @@ class MetaVideoService
         $this->pageAccessToken = config('services.facebook.page_access_token');
     }
 
+    public function createLinkPost(string $message, string $sourceurl): array
+    {
+        $endpoint = "https://graph.facebook.com/v24.0/{$this->pageId}/feed";
+
+        try {
+            $response = Http::post($endpoint, [
+                'access_token' => $this->pageAccessToken,
+                'link'  => $sourceurl,   // The public video URL
+                'description'  => $message,    // Post caption
+            ]);
+            Log::info("Respond : ", [$response]);
+            if ($response->failed()) {
+                Log::error('Facebook Link post Upload Failed', [
+                    'status' => $response->status(),
+                    'body'   => $response->body(),
+                ]);
+                return [
+                    'success' => false,
+                    'error'   => $response->json(),
+                ];
+            }
+
+            return [
+                'success'   => true,
+                'result'    => $response->json(),
+            ];
+        } catch (\Exception $e) {
+            Log::error('Facebook link post Upload Exception', [
+                'error' => $e->getMessage(),
+            ]);
+
+            return [
+                'success' => false,
+                'error'   => $e->getMessage(),
+            ];
+        }
+    }
+
     public function createVideoPost(string $videoUrl, string $message): array
     {
         $endpoint = "https://graph.facebook.com/v24.0/{$this->pageId}/videos";
-        Log::info('Endpoint : ', [$endpoint]);
-        Log::info("FileURL : ", [$videoUrl]);
+
         try {
             $response = Http::post($endpoint, [
                 'access_token' => $this->pageAccessToken,
