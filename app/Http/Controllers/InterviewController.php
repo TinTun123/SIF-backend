@@ -82,7 +82,8 @@ class InterviewController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(Request $request,  MetaVideoService $meta)
+    // public function create(Request $request,  MetaVideoService $meta)
+    public function create(Request $request)
     {
         //
         $validated = $request->validate([
@@ -93,8 +94,8 @@ class InterviewController extends Controller
             'videoFile' => 'required|file|mimes:mp4,mov,avi,webm', // or 'file|mimetypes:video/*' if uploading file directly
             'quote' => 'nullable|string',
             'thumbnail' => 'required|file|mimes:jpg,jpeg,png',
-            'FbEnabled' => 'required|boolean',
-            'FbMessage' => 'nullable|string'
+            // 'FbEnabled' => 'required|boolean',
+            // 'FbMessage' => 'nullable|string'
         ]);
 
 
@@ -135,10 +136,10 @@ class InterviewController extends Controller
         ]);
 
 
-        if ($validated['FbEnabled']) {
-            // POST video with message
-            $videoId = $meta->createVideoPost($coverUrl, $validated["FbMessage"]);
-        }
+        // if ($validated['FbEnabled']) {
+        //     // POST video with message
+        //     $videoId = $meta->createVideoPost($coverUrl, $validated["FbMessage"]);
+        // }
 
         return response()->json([
             'success' => true,

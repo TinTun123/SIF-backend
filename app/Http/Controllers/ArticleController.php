@@ -34,7 +34,8 @@ class ArticleController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(Request $request, MetaVideoService $meta)
+    // public function create(Request $request, MetaVideoService $meta)
+    public function create(Request $request)
     {
         //
         $validated = $request->validate([
@@ -46,8 +47,8 @@ class ArticleController extends Controller
             'date' => 'required|date|before_or_equal:today',
             'content_eng' => 'nullable|string',
             'content_bur' => 'nullable|string',
-            'FbEnabled' => 'required|boolean',
-            'FbMessage' => 'nullable|string'
+            // 'FbEnabled' => 'required|boolean',
+            // 'FbMessage' => 'nullable|string'
         ]);
 
         $coverUrl = null;
@@ -79,10 +80,10 @@ class ArticleController extends Controller
             'cover_url' => $coverUrl,
         ]);
 
-        if ($validated['FbEnabled']) {
-            // POST video with message
-            $respond = $meta->createLinkPost($validated["FbMessage"], url("/share/article/$article->id"));
-        }
+        // if ($validated['FbEnabled']) {
+        //     // POST video with message
+        //     $respond = $meta->createLinkPost($validated["FbMessage"], url("/share/article/$article->id"));
+        // }
 
 
         return response()->json([

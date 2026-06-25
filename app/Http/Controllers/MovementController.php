@@ -32,7 +32,8 @@ class MovementController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(Request $request, MetaVideoService $meta)
+    // public function create(Request $request, MetaVideoService $meta)
+    public function create(Request $request)
     {
         //
         $validated = $request->validate([
@@ -42,8 +43,8 @@ class MovementController extends Controller
             'story_date' => 'required|date|before_or_equal:today',
             'content_eng' => 'nullable|string',
             'content_bur' => 'nullable|string',
-            'FbEnabled' => 'required|boolean',
-            'FbMessage' => 'nullable|string'
+            // 'FbEnabled' => 'required|boolean',
+            // 'FbMessage' => 'nullable|string'
         ]);
 
         $coverUrl = null;
@@ -72,10 +73,10 @@ class MovementController extends Controller
             'cover_url' => $coverUrl,
         ]);
 
-        if ($validated['FbEnabled']) {
-            // POST video with message
-            $respond = $meta->createLinkPost($validated["FbMessage"], url("/share/movement/$movement->id"));
-        }
+        // if ($validated['FbEnabled']) {
+        //     // POST video with message
+        //     $respond = $meta->createLinkPost($validated["FbMessage"], url("/share/movement/$movement->id"));
+        // }
 
         return response()->json([
             'success' => true,

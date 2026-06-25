@@ -80,7 +80,8 @@ class MusicController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(Request $request, MetaVideoService $meta)
+    // public function create(Request $request, MetaVideoService $meta)
+    public function create(Request $request)
     {
         //
         $validated = $request->validate([
@@ -89,8 +90,8 @@ class MusicController extends Controller
             'file_url' => 'required|file|mimes:mp4,mov,avi,webm,wmv,flv,mpeg,mpg',
             'date' => 'required|date|before_or_equal:today',
             'thumbnail' => 'required|file|mimes:jpg,jpeg,png',
-            'FbEnabled' => 'required|boolean',
-            'FbMessage' => 'nullable|string'
+            // 'FbEnabled' => 'required|boolean',
+            // 'FbMessage' => 'nullable|string'
         ]);
 
         $coverUrl = null;
@@ -127,10 +128,10 @@ class MusicController extends Controller
         ]);
 
 
-        if ($validated['FbEnabled']) {
-            // POST video with message
-            $videoId = $meta->createVideoPost($coverUrl, $validated["FbMessage"]);
-        }
+        // if ($validated['FbEnabled']) {
+        //     // POST video with message
+        //     $videoId = $meta->createVideoPost($coverUrl, $validated["FbMessage"]);
+        // }
 
         return response()->json([
             'success' => true,

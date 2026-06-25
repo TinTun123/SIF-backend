@@ -34,14 +34,15 @@ class PosterController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(Request $request, MetaVideoService $meta)
+    // public function create(Request $request, MetaVideoService $meta)
+    public function create(Request $request)
     {
         //
         $validated = $request->validate([
             'images.*' => 'nullable|file|mimes:jpg,jpeg,png,webp,svg',
             'date' => 'required|date|before_or_equal:today',
-            'FbEnabled' => 'required|boolean',
-            'FbMessage' => 'nullable|string'
+            // 'FbEnabled' => 'required|boolean',
+            // 'FbMessage' => 'nullable|string'
         ]);
 
         $images = [];
@@ -64,10 +65,10 @@ class PosterController extends Controller
             'images' => json_encode($images),
         ]);
 
-        if ($validated['FbEnabled']) {
-            // POST video with message
-            $respond = $meta->createCarousalPost($validated['FbMessage'], $images);
-        }
+        // if ($validated['FbEnabled']) {
+        //     // POST video with message
+        //     $respond = $meta->createCarousalPost($validated['FbMessage'], $images);
+        // }
 
         return response()->json([
             'success' => true,

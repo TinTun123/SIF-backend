@@ -1,0 +1,60 @@
+services:
+    app:
+        build: .
+        container_name: sif-app
+        working_dir: /var/www/html
+        volumes:
+            - .:/var/www/html
+            - ./uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
+        ports:
+            - "8000:8000"
+        networks:
+            - sif-network
+        depends_on:
+            - db
+
+    db:
+        image: mariadb:11
+        container_name: sif-db
+        restart: unless-stopped
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: sifdb
+        ports:
+            - "3306:3306"
+        volumes:
+            - mariadb_data:/var/lib/mysql
+        networks:
+            - sif-network
+
+volumes:
+    mariadb_data:
+
+networks:
+    sif-network:
+        driver: bridge
+
+# services:
+#     app:
+#         build: .
+#         container_name: sif-app
+#         working_dir: /var/www/html
+#         volumes:
+#             - .:/var/www/html
+#         ports:
+#             - "8000:8000"
+
+#     db:
+#         image: mariadb:11
+#         container_name: sif-db
+#         restart: unless-stopped
+#         environment:
+#             MYSQL_ROOT_PASSWORD: root
+#             MYSQL_DATABASE: sifdb
+#         ports:
+#             - "3306:3306"
+#         volumes:
+#             - mariadb_data:/var/lib/mysql
+
+# volumes:
+#     mariadb_data:
